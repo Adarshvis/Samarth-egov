@@ -20,6 +20,7 @@ import ScreenshotGalleryBlock from './blocks/ScreenshotGalleryBlock'
 import HelpSupportBlock from './blocks/HelpSupportBlock'
 import FlexibleRowBlock from './blocks/FlexibleRowBlock'
 import CareerPostingBlock from './blocks/CareerPostingBlock'
+import StatesOnboardedBlock from './blocks/StatesOnboardedBlock'
 
 const blockComponents: Record<string, React.ComponentType<any>> = {
   hero: HeroBlock,
@@ -43,6 +44,7 @@ const blockComponents: Record<string, React.ComponentType<any>> = {
   contentWithMedia: ContentWithMediaBlock,
   flexibleRow: FlexibleRowBlock,
   careerPosting: CareerPostingBlock,
+  statesOnboarded: StatesOnboardedBlock,
 }
 
 interface BlockRendererProps {

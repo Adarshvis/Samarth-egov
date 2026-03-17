@@ -1,61 +1,40 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
 async function syncNavToHeader(payload: any) {
-  const pages = await payload.find({
+  // 1. Fetch current header to preserve manual items and submenus
+  const header = await payload.findGlobal({ slug: 'header', depth: 0 })
+  const existingNav = header.navItems || []
+
+  // 2. Fetch all pages so we can distinguish between page links and manual external links
+  const allPages = await payload.find({ collection: 'pages', limit: 1000, depth: 0 })
+  const allPageUrls = new Set(allPages.docs.map((p: any) => p.slug === 'home' ? '/' : `/${p.slug}`))
+
+  // 3. Filter out existing nav items that belong to pages (we will rebuild them). 
+  // This leaves behind completely manual/external links so they don't get deleted!
+  const manualNavItems = existingNav.filter((item: any) => !allPageUrls.has(item.url))
+
+  // 4. Fetch the pages that SHOULD be in the nav
+  const activePages = await payload.find({
     collection: 'pages',
-    where: {
-      showInNav: { equals: true },
-      status: { equals: 'published' },
-    },
-    overrideAccess: true,
-    depth: 2,
+    where: { showInNav: { equals: true }, status: { equals: 'published' } },
+    sort: ['navOrder', 'createdAt'],
     limit: 100,
-    sort: ['navOrder', 'createdAt'], // secondary sort ensures stable order even when navOrder is equal
+    depth: 0
   })
 
-  // Collect every page ID that is referenced as a navChild of some other page
-  const childPageIds = new Set<string>()
-  for (const page of pages.docs) {
-    const rawChildren: any[] = page.navChildren || []
-    for (const item of rawChildren) {
-      const relatedId = typeof item.page === 'object' ? item.page?.id : item.page
-      if (relatedId) childPageIds.add(String(relatedId))
-    }
-  }
-
-  // Only top-level pages (not referenced as a child anywhere)
-  const topLevelPages = pages.docs.filter((p: any) => !childPageIds.has(String(p.id)))
-
-  const navItems = topLevelPages.map((page: any) => {
-    const rawChildren: any[] = page.navChildren || []
-
-    const resolvedChildren = rawChildren
-      .map((item: any) => {
-        const related = typeof item.page === 'object' ? item.page : null
-        if (!related) return null
-        // Store as { page: { slug, title } } so Header can build the URL from child.page.slug
-        return {
-          label: item.label || related.title,
-          page: {
-            slug: related.slug,
-            title: related.title,
-          },
-        }
-      })
-      .filter(Boolean)
-
-    if (resolvedChildren.length > 0) {
-      return {
-        label: page.title,
-        children: resolvedChildren,
-      }
-    }
-
+  // 5. Build the new page links, but PRESERVE their existing `children` submenus
+  const pageNavItems = activePages.docs.map((page: any) => {
+    const url = page.slug === 'home' ? '/' : `/${page.slug}`
+    const previousItem = existingNav.find((item: any) => item.url === url)
     return {
       label: page.title,
-      url: page.slug === 'home' ? '/' : `/${page.slug}`,
+      url: url,
+      children: previousItem?.children || [], // Keep the submenus the admin built in the Header global!
     }
   })
+
+  // Combine them: Page links first (sorted by navOrder), then any manual links at the end
+  const navItems = [...pageNavItems, ...manualNavItems]
 
   await payload.updateGlobal({
     slug: 'header',

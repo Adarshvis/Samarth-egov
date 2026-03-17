@@ -206,7 +206,7 @@ export interface Page {
   };
   status: 'draft' | 'published';
   /**
-   * Show this page in the header navigation
+   * Automatically add this page to the header navigation
    */
   showInNav?: boolean | null;
   /**
@@ -366,6 +366,46 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'marquee';
+      }
+    | {
+        heading: string;
+        /**
+         * Optional descriptive text below the heading
+         */
+        description?: string | null;
+        /**
+         * Add the states that are currently onboarded
+         */
+        states: {
+          /**
+           * E.g., Maharashtra
+           */
+          stateName: string;
+          /**
+           * Link to this state's SamarthX portal (e.g., https://mah.samarthx.in)
+           */
+          portalUrl: string;
+          /**
+           * Optional short tagline (e.g., Active Since 2026)
+           */
+          tagline?: string | null;
+          /**
+           * Pick the theme color for the state card highlight and button
+           */
+          themeColor?: string | null;
+          /**
+           * Opacity of the background image (0 to 100)
+           */
+          imageOpacity?: number | null;
+          /**
+           * Optional subtle background image or map outline SVG for this card
+           */
+          backgroundImage?: (number | null) | Media;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'statesOnboarded';
       }
     | {
         /**
@@ -1640,6 +1680,25 @@ export interface PagesSelect<T extends boolean = true> {
               speed?: T;
               pauseOnHover?: T;
               separator?: T;
+              id?: T;
+              blockName?: T;
+            };
+        statesOnboarded?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              states?:
+                | T
+                | {
+                    stateName?: T;
+                    portalUrl?: T;
+                    tagline?: T;
+                    themeColor?: T;
+                    imageOpacity?: T;
+                    backgroundImage?: T;
+                    id?: T;
+                  };
               id?: T;
               blockName?: T;
             };

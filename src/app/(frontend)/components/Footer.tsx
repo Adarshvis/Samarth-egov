@@ -181,9 +181,9 @@ export default function Footer({ data, siteSettings }: FooterProps) {
             </div>
           )}
 
-          {/* Logos — always last, pinned to the right */}
+          {/* Logos — always last, pinned to the right on desktop, centered on mobile */}
           {hasLogos && (
-            <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', marginLeft: 'auto' }}>
+            <div className="flex-shrink-0 flex flex-col gap-3 mt-4 md:mt-0 md:ml-auto items-center md:items-end w-full md:w-auto">
               {leftLogo && (
                 <div style={{ background: '#fff', borderRadius: '0.5rem', padding: '0.5rem 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Image

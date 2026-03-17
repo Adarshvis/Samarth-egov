@@ -22,6 +22,7 @@ import { ScreenshotGallery } from '../blocks/ScreenshotGallery'
 import { HelpSupport } from '../blocks/HelpSupport'
 import { FlexibleRow } from '../blocks/FlexibleRow'
 import { CareerPosting } from '../blocks/CareerPosting'
+import { StatesOnboarded } from '../blocks/StatesOnboarded'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -121,9 +122,10 @@ export const Pages: CollectionConfig = {
       name: 'showInNav',
       type: 'checkbox',
       defaultValue: true,
+      label: 'Show in Navigation',
       admin: {
         position: 'sidebar',
-        description: 'Show this page in the header navigation',
+        description: 'Automatically add this page to the header navigation',
       },
     },
     {
@@ -150,6 +152,7 @@ export const Pages: CollectionConfig = {
       blocks: [
         Hero,
         Marquee,
+        StatesOnboarded,
         ShowcaseCards,
         Statistics,
         NewsUpdates,
