@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import { adminAccess } from '../access/roles'
 
+const resumesUploadDir = process.env.CMS_RESUMES_UPLOAD_DIR || 'resumes'
+
 export const Resumes: CollectionConfig = {
   slug: 'resumes',
   labels: {
@@ -22,7 +24,7 @@ export const Resumes: CollectionConfig = {
     delete: adminAccess,
   },
   upload: {
-    staticDir: 'resumes',
+    staticDir: resumesUploadDir,
     mimeTypes: ['application/pdf'],
   },
   fields: [

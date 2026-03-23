@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
-import { RichText } from '@payloadcms/richtext-lexical/react'
+import RichText from '../ui/RichText'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 

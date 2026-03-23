@@ -23,6 +23,7 @@ import { HelpSupport } from '../blocks/HelpSupport'
 import { FlexibleRow } from '../blocks/FlexibleRow'
 import { CareerPosting } from '../blocks/CareerPosting'
 import { StatesOnboarded } from '../blocks/StatesOnboarded'
+import { FormLayout } from '../blocks/FormLayout'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -159,6 +160,7 @@ export const Pages: CollectionConfig = {
         InteractiveMap,
         ScreenshotGallery,
         HelpSupport,
+        FormLayout,
         RichContent,
         FeatureCards,
         CallToAction,

@@ -335,13 +335,13 @@ export default function HeroBlock(props: HeroBlockProps) {
           className={`max-w-7xl mx-auto flex flex-col ${isTextLeft ? 'lg:flex-row' : 'lg:flex-row-reverse'} min-h-[inherit]`}
           style={{ minHeight: `${heroHeight}px` }}
         >
-          <div className="flex-1 relative px-6 sm:px-10 lg:px-16 py-16 min-h-[320px] lg:min-h-0">
+          <div className="flex-1 relative px-6 sm:px-10 lg:px-16 py-10 sm:py-12 lg:py-16 min-h-[320px] lg:min-h-0">
             {allSlides.map((slide, i) => {
               const textSlide = hasTextContent(slide) ? slide : fallbackTextSlide
               return (
                 <div
                   key={slide.id || `split-text-${i}`}
-                  className={`absolute inset-0 flex items-center px-6 sm:px-10 lg:px-16 py-16 transition-opacity duration-700 ease-in-out ${
+                  className={`absolute inset-0 flex items-start px-6 sm:px-10 lg:px-16 py-10 sm:py-12 lg:py-16 transition-opacity duration-700 ease-in-out ${
                     i === current ? 'opacity-100' : 'opacity-0 pointer-events-none'
                   }`}
                 >

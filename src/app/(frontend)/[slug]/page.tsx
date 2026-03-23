@@ -44,9 +44,9 @@ export default async function DynamicPage({ params }: PageProps) {
   if (!page) notFound()
 
   return (
-    <>
+    <div className="cms-page-shell">
       <PageBanner title={page.title} slug={slug} />
       <BlockRenderer blocks={page.layout} />
-    </>
+    </div>
   )
 }

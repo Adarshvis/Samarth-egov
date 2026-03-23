@@ -6,10 +6,18 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
 
-    const applicantName = formData.get('applicantName') as string
-    const email = formData.get('email') as string
-    const phone = formData.get('phone') as string
-    const jobTitle = formData.get('jobTitle') as string
+    const getValue = (keys: string[]): string => {
+      for (const key of keys) {
+        const value = formData.get(key)
+        if (typeof value === 'string' && value.trim()) return value.trim()
+      }
+      return ''
+    }
+
+    const applicantName = getValue(['applicantName', 'fullName', 'name'])
+    const email = getValue(['email'])
+    const phone = getValue(['phone', 'phoneNumber', 'mobile'])
+    const jobTitle = getValue(['jobTitle', 'positionApplyingFor', 'position', 'select', 'role'])
     const file = formData.get('resume') as File | null
 
     // Basic validation

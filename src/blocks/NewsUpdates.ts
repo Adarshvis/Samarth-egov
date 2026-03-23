@@ -20,10 +20,27 @@ export const NewsUpdates: Block = {
       },
     },
     {
+      name: 'entryType',
+      type: 'select',
+      defaultValue: 'manual',
+      required: true,
+      label: 'News Source',
+      options: [
+        { label: 'Manual Entry', value: 'manual' },
+        { label: 'Fetch from News Collection', value: 'collection' },
+      ],
+      admin: {
+        description: 'Choose manual card entry or automatic fetch from News collection.',
+      },
+    },
+    {
       name: 'articles',
       type: 'array',
-      required: true,
+      required: false,
       label: 'Articles',
+      admin: {
+        condition: (_, siblingData) => siblingData?.entryType !== 'collection',
+      },
       fields: [
         {
           name: 'title',
@@ -57,6 +74,49 @@ export const NewsUpdates: Block = {
         },
         iconField('icon', 'Category Icon'),
         colorField('categoryColor', 'Category Badge Color', '#3B82F6'),
+      ],
+    },
+    {
+      name: 'collectionSource',
+      type: 'group',
+      label: 'Collection Fetch Settings',
+      admin: {
+        condition: (_, siblingData) => siblingData?.entryType === 'collection',
+      },
+      fields: [
+        {
+          name: 'limit',
+          type: 'number',
+          defaultValue: 6,
+          min: 1,
+          max: 24,
+          required: true,
+          admin: {
+            description: 'Maximum number of cards to fetch',
+          },
+        },
+        {
+          name: 'sortBy',
+          type: 'select',
+          defaultValue: 'latest',
+          options: [
+            { label: 'Latest First', value: 'latest' },
+            { label: 'Oldest First', value: 'oldest' },
+          ],
+        },
+        {
+          name: 'category',
+          type: 'text',
+          admin: {
+            description: 'Optional category filter (exact match)',
+          },
+        },
+        {
+          name: 'featuredOnly',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Fetch only featured news',
+        },
       ],
     },
     {

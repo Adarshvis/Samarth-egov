@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import DynamicIcon from '../ui/DynamicIcon'
 import SectionHeading from '../ui/SectionHeading'
@@ -24,7 +24,14 @@ interface NewsUpdatesBlockProps {
   sectionDescription?: string | null
   headingAlignment?: 'left' | 'center' | 'right' | null
   layout?: 'cards' | 'spotlight' | null
-  articles: ArticleData[]
+  entryType?: 'manual' | 'collection' | null
+  articles?: ArticleData[]
+  collectionSource?: {
+    limit?: number | null
+    sortBy?: 'latest' | 'oldest' | null
+    category?: string | null
+    featuredOnly?: boolean | null
+  } | null
   columns?: '2' | '3' | null
   bottomLink?: {
     enabled?: boolean | null
@@ -32,6 +39,16 @@ interface NewsUpdatesBlockProps {
     url?: string | null
   } | null
   backgroundColor?: string | null
+}
+
+interface NewsCollectionDoc {
+  id?: string | number
+  title: string
+  excerpt?: string | null
+  featuredImage?: any
+  category?: string | null
+  publishedDate?: string | null
+  slug?: string | null
 }
 
 const columnClasses: Record<string, string> = {
@@ -48,6 +65,41 @@ function formatDate(dateStr: string): string {
     })
   } catch {
     return dateStr
+  }
+}
+
+function buildNewsApiUrl(collectionSource?: NewsUpdatesBlockProps['collectionSource']) {
+  const params = new URLSearchParams()
+  const limit =
+    typeof collectionSource?.limit === 'number' && collectionSource.limit > 0
+      ? collectionSource.limit
+      : 6
+
+  params.set('limit', String(limit))
+  params.set('depth', '1')
+  params.set('where[status][equals]', 'published')
+  params.set('sort', collectionSource?.sortBy === 'oldest' ? 'publishedDate' : '-publishedDate')
+
+  if (collectionSource?.featuredOnly) {
+    params.set('where[isFeatured][equals]', 'true')
+  }
+
+  if (collectionSource?.category && collectionSource.category.trim()) {
+    params.set('where[category][equals]', collectionSource.category.trim())
+  }
+
+  return `/api/news?${params.toString()}`
+}
+
+function mapNewsDocToArticle(doc: NewsCollectionDoc): ArticleData {
+  return {
+    id: typeof doc.id === 'string' || typeof doc.id === 'number' ? String(doc.id) : null,
+    title: doc.title,
+    excerpt: doc.excerpt || null,
+    image: doc.featuredImage,
+    category: doc.category || null,
+    date: doc.publishedDate || null,
+    url: doc.slug ? `/news/${doc.slug}` : null,
   }
 }
 
@@ -162,35 +214,37 @@ function SpotlightLayout({ articles }: { articles: ArticleData[] }) {
       </div>
 
       {/* Side list */}
-      <div className="lg:col-span-2 flex flex-col gap-4">
+      <div className="lg:col-span-2 flex flex-col gap-4 lg:h-full">
         {sideArticles.map((article, i) => {
           const imgUrl =
             typeof article.image === 'object' && article.image?.url ? article.image.url : null
 
           return (
             <ScrollReveal key={article.id || i} delay={i * 100}>
-              <div className="group flex gap-4 bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
-                {imgUrl && (
-                  <div className="relative w-24 h-20 shrink-0 rounded-lg overflow-hidden">
-                    <Image
-                      src={imgUrl}
-                      alt={typeof article.image === 'object' ? article.image.alt || article.title : article.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  {article.date && (
-                    <div className="text-gray-400 text-xs mb-1">{formatDate(article.date)}</div>
+              <div className="h-full">
+                <div className="group flex h-full min-h-[116px] gap-4 bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+                  {imgUrl && (
+                    <div className="relative w-24 h-20 shrink-0 rounded-lg overflow-hidden">
+                      <Image
+                        src={imgUrl}
+                        alt={typeof article.image === 'object' ? article.image.alt || article.title : article.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   )}
-                  <h4 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
-                    {article.url ? (
-                      <a href={article.url}>{article.title}</a>
-                    ) : (
-                      article.title
+                  <div className="flex-1 min-w-0">
+                    {article.date && (
+                      <div className="text-gray-400 text-xs mb-1">{formatDate(article.date)}</div>
                     )}
-                  </h4>
+                    <h4 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      {article.url ? (
+                        <a href={article.url}>{article.title}</a>
+                      ) : (
+                        article.title
+                      )}
+                    </h4>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -208,19 +262,87 @@ export default function NewsUpdatesBlock(props: NewsUpdatesBlockProps) {
     sectionDescription,
     headingAlignment,
     layout = 'cards',
+    entryType = 'manual',
     articles,
+    collectionSource,
     columns = '3',
     bottomLink,
-    backgroundColor = '#F9FAFB',
+    backgroundColor = 'var(--bg-muted)',
   } = props
 
-  if (!articles || articles.length === 0) return null
+  const [fetchedArticles, setFetchedArticles] = useState<ArticleData[]>([])
+  const [loadingFetchedArticles, setLoadingFetchedArticles] = useState(false)
+
+  useEffect(() => {
+    if (entryType !== 'collection') {
+      setFetchedArticles([])
+      return
+    }
+
+    let active = true
+
+    async function fetchCollectionNews() {
+      try {
+        setLoadingFetchedArticles(true)
+        const res = await fetch(buildNewsApiUrl(collectionSource), {
+          credentials: 'same-origin',
+        })
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch news collection')
+        }
+
+        const data = await res.json()
+        const docs = Array.isArray(data?.docs) ? (data.docs as NewsCollectionDoc[]) : []
+
+        if (active) {
+          setFetchedArticles(docs.map(mapNewsDocToArticle))
+        }
+      } catch {
+        if (active) {
+          setFetchedArticles([])
+        }
+      } finally {
+        if (active) {
+          setLoadingFetchedArticles(false)
+        }
+      }
+    }
+
+    void fetchCollectionNews()
+
+    return () => {
+      active = false
+    }
+  }, [entryType, collectionSource?.category, collectionSource?.featuredOnly, collectionSource?.limit, collectionSource?.sortBy])
+
+  const displayArticles = useMemo(() => {
+    if (entryType === 'collection') return fetchedArticles
+    return articles || []
+  }, [articles, entryType, fetchedArticles])
+
+  if (loadingFetchedArticles && entryType === 'collection' && displayArticles.length === 0) {
+    return (
+      <section className="py-16 px-6" style={{ backgroundColor: backgroundColor || 'var(--bg-muted)' }}>
+        <div className="max-w-7xl mx-auto">
+          <SectionHeading
+            heading={sectionHeading}
+            description={sectionDescription}
+            alignment={headingAlignment}
+          />
+          <p>Loading news...</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (!displayArticles || displayArticles.length === 0) return null
 
   const style = layout || 'cards'
   const cols = columns || '3'
 
   return (
-    <section className="py-16 px-6" style={{ backgroundColor: backgroundColor || '#F9FAFB' }}>
+    <section className="py-16 px-6" style={{ backgroundColor: backgroundColor || 'var(--bg-muted)' }}>
       <div className="max-w-7xl mx-auto">
         <SectionHeading
           heading={sectionHeading}
@@ -229,10 +351,10 @@ export default function NewsUpdatesBlock(props: NewsUpdatesBlockProps) {
         />
 
         {style === 'spotlight' ? (
-          <SpotlightLayout articles={articles} />
+          <SpotlightLayout articles={displayArticles} />
         ) : (
           <div className={`grid ${columnClasses[cols]} gap-6`}>
-            {articles.map((article, i) => (
+            {displayArticles.map((article, i) => (
               <ScrollReveal key={article.id || i} delay={i * 100}>
                 <NewsCard article={article} />
               </ScrollReveal>

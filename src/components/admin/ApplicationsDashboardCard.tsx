@@ -7,6 +7,7 @@ const STATUS_OPTIONS = [
   { value: 'reviewed', label: 'Reviewed', color: '#f59e0b', bg: '#fffbeb' },
   { value: 'shortlisted', label: 'Shortlisted', color: '#10b981', bg: '#f0fdf4' },
   { value: 'rejected', label: 'Rejected', color: '#ef4444', bg: '#fef2f2' },
+  { value: 'deleted', label: 'Delete', color: '#7f1d1d', bg: '#fee2e2' },
 ]
 
 function getStatusStyle(status: string | null | undefined) {
@@ -68,15 +69,30 @@ export default function ApplicationsWidget() {
   async function handleStatusChange(id: string, status: string) {
     setUpdating(id)
     try {
-      await fetch(`/api/job-applications/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status }),
+      const endpoint = `/api/job-applications/${id}`
+      const res =
+        status === 'deleted'
+          ? await fetch(endpoint, {
+              method: 'DELETE',
+              credentials: 'include',
+            })
+          : await fetch(endpoint, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ status }),
+            })
+
+      if (!res.ok) {
+        throw new Error(`Status update failed: ${res.status}`)
+      }
+
+      setApplications((prev) => {
+        if (status === 'deleted') {
+          return prev.filter((app) => app.id !== id)
+        }
+        return prev.map((app) => (app.id === id ? { ...app, status } : app))
       })
-      setApplications((prev) =>
-        prev.map((app) => (app.id === id ? { ...app, status } : app)),
-      )
     } finally {
       setUpdating(null)
     }

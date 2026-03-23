@@ -26,6 +26,7 @@ const STATUS_OPTIONS = [
   { value: 'reviewed', label: 'Reviewed', color: '#f59e0b', bg: '#fffbeb' },
   { value: 'shortlisted', label: 'Shortlisted', color: '#10b981', bg: '#f0fdf4' },
   { value: 'rejected', label: 'Rejected', color: '#ef4444', bg: '#fef2f2' },
+  { value: 'deleted', label: 'Delete', color: '#7f1d1d', bg: '#fee2e2' },
 ]
 
 function getStatusStyle(status: string | null | undefined) {
@@ -71,15 +72,30 @@ export default function ApplicationsDashboardClient({
 
   function handleStatusChange(id: string, newStatus: string) {
     startTransition(async () => {
-      await fetch(`/api/admin/local/collections/job-applications/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-        credentials: 'include',
+      const endpoint = `/api/job-applications/${id}`
+      const res =
+        newStatus === 'deleted'
+          ? await fetch(endpoint, {
+              method: 'DELETE',
+              credentials: 'include',
+            })
+          : await fetch(endpoint, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: newStatus }),
+              credentials: 'include',
+            })
+
+      if (!res.ok) {
+        throw new Error(`Status update failed: ${res.status}`)
+      }
+
+      setApplications((prev) => {
+        if (newStatus === 'deleted') {
+          return prev.filter((app) => app.id !== id)
+        }
+        return prev.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
       })
-      setApplications((prev) =>
-        prev.map((app) => (app.id === id ? { ...app, status: newStatus } : app)),
-      )
     })
   }
 

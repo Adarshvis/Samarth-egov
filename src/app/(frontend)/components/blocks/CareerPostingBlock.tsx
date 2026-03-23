@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { RichText } from '@payloadcms/richtext-lexical/react'
+import RichText from '../ui/RichText'
 import { ChevronDown } from 'lucide-react'
 
 interface ProblemDomain {

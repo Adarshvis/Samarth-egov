@@ -15,15 +15,6 @@ export const SiteSettings: GlobalConfig = {
       required: true,
     },
     {
-      name: 'siteDescription',
-      type: 'textarea',
-    },
-    {
-      name: 'logo',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
       name: 'favicon',
       type: 'upload',
       relationTo: 'media',
@@ -66,24 +57,49 @@ export const SiteSettings: GlobalConfig = {
             description: 'Pick accent/highlight color',
           },
         },
-      ],
-    },
-    {
-      type: 'group',
-      name: 'contact',
-      label: 'Contact Information',
-      fields: [
         {
-          name: 'email',
-          type: 'email',
-        },
-        {
-          name: 'phone',
+          name: 'backgroundColor',
           type: 'text',
+          defaultValue: '#FFFFFF',
+          admin: {
+            components: {
+              Field: '@/components/admin/ColorPickerField#ColorPickerField',
+            },
+            description: 'Main page background color',
+          },
         },
         {
-          name: 'address',
-          type: 'textarea',
+          name: 'surfaceColor',
+          type: 'text',
+          defaultValue: '#FFFFFF',
+          admin: {
+            components: {
+              Field: '@/components/admin/ColorPickerField#ColorPickerField',
+            },
+            description: 'Card/surface background color',
+          },
+        },
+        {
+          name: 'mutedBackgroundColor',
+          type: 'text',
+          defaultValue: '#F1F5F9',
+          admin: {
+            components: {
+              Field: '@/components/admin/ColorPickerField#ColorPickerField',
+            },
+            description: 'Section muted background color',
+          },
+        },
+        {
+          name: 'textColor',
+          type: 'text',
+          defaultValue: '#111827',
+          admin: {
+            components: {
+              Field: '@/components/admin/ColorPickerField#ColorPickerField',
+            },
+            description: 'Default body text color',
+          },
         },
       ],
     },

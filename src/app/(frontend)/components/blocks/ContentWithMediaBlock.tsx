@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { RichText } from '@payloadcms/richtext-lexical/react'
+import RichText from '../ui/RichText'
 import type { Media as MediaType } from '@/payload-types'
 import SectionHeading from '../ui/SectionHeading'
 

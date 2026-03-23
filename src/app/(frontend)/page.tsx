@@ -37,5 +37,9 @@ export default async function HomePage() {
 
   if (!page) notFound()
 
-  return <BlockRenderer blocks={page.layout} />
+  return (
+    <div className="cms-page-shell">
+      <BlockRenderer blocks={page.layout} />
+    </div>
+  )
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import { RichText } from '@payloadcms/richtext-lexical/react'
+import RichText from '../ui/RichText'
 import SectionHeading from '../ui/SectionHeading'
 
 interface FAQBlockProps {

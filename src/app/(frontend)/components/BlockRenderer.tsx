@@ -21,6 +21,7 @@ import HelpSupportBlock from './blocks/HelpSupportBlock'
 import FlexibleRowBlock from './blocks/FlexibleRowBlock'
 import CareerPostingBlock from './blocks/CareerPostingBlock'
 import StatesOnboardedBlock from './blocks/StatesOnboardedBlock'
+import FormLayoutBlock from './blocks/FormLayoutBlock'
 
 const blockComponents: Record<string, React.ComponentType<any>> = {
   hero: HeroBlock,
@@ -31,6 +32,7 @@ const blockComponents: Record<string, React.ComponentType<any>> = {
   interactiveMap: InteractiveMapBlock,
   screenshotGallery: ScreenshotGalleryBlock,
   helpSupport: HelpSupportBlock,
+  formLayout: FormLayoutBlock,
   richContent: RichContentBlock,
   featureCards: FeatureCardsBlock,
   callToAction: CallToActionBlock,

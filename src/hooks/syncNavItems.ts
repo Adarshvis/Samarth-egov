@@ -4,6 +4,16 @@ async function syncNavToHeader(payload: any) {
   // 1. Fetch current header to preserve manual items and submenus
   const header = await payload.findGlobal({ slug: 'header', depth: 0 })
   const existingNav = header.navItems || []
+  const hiddenPageUrls = new Set(
+    (header.navSyncHiddenPageUrls || [])
+      .map((item: { url?: string }) => item?.url)
+      .filter((url: unknown): url is string => typeof url === 'string' && url.length > 0),
+  )
+  const lastSyncedPageUrls = new Set(
+    (header.navSyncLastSyncedPageUrls || [])
+      .map((item: { url?: string }) => item?.url)
+      .filter((url: unknown): url is string => typeof url === 'string' && url.length > 0),
+  )
 
   // 2. Fetch all pages so we can distinguish between page links and manual external links
   const allPages = await payload.find({ collection: 'pages', limit: 1000, depth: 0 })
@@ -21,6 +31,31 @@ async function syncNavToHeader(payload: any) {
     limit: 100,
     depth: 0
   })
+  const activePageUrls = new Set(
+    activePages.docs.map((page: any) => (page.slug === 'home' ? '/' : `/${page.slug}`)),
+  )
+
+  // Detect page links removed manually from Header nav after previous sync and persist them as hidden.
+  const currentPageUrlsInNav = new Set(
+    existingNav
+      .map((item: any) => item?.url)
+      .filter((url: unknown): url is string => typeof url === 'string' && activePageUrls.has(url)),
+  )
+
+  for (const url of lastSyncedPageUrls) {
+    if (activePageUrls.has(url) && !currentPageUrlsInNav.has(url)) {
+      hiddenPageUrls.add(url)
+    }
+  }
+
+  // If admin adds a previously hidden page URL back manually, unhide it.
+  for (const url of currentPageUrlsInNav) {
+    hiddenPageUrls.delete(url)
+  }
+
+  // Keep hidden list clean by retaining only currently active page URLs.
+  const nextHiddenUrls = [...hiddenPageUrls].filter((url) => activePageUrls.has(url))
+  const nextHiddenSet = new Set(nextHiddenUrls)
 
   // 5. Build the new page links, but PRESERVE their existing `children` submenus
   const pageNavItems = activePages.docs.map((page: any) => {
@@ -31,14 +66,18 @@ async function syncNavToHeader(payload: any) {
       url: url,
       children: previousItem?.children || [], // Keep the submenus the admin built in the Header global!
     }
-  })
+  }).filter((item: any) => !nextHiddenSet.has(item.url))
 
   // Combine them: Page links first (sorted by navOrder), then any manual links at the end
   const navItems = [...pageNavItems, ...manualNavItems]
 
   await payload.updateGlobal({
     slug: 'header',
-    data: { navItems },
+    data: {
+      navItems,
+      navSyncHiddenPageUrls: nextHiddenUrls.map((url) => ({ url })),
+      navSyncLastSyncedPageUrls: pageNavItems.map((item: any) => ({ url: item.url })),
+    },
     overrideAccess: true,
   })
 }

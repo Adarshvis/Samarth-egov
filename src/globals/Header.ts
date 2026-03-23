@@ -218,6 +218,34 @@ export const Header: GlobalConfig = {
         },
       ],
     },
+    {
+      name: 'navSyncHiddenPageUrls',
+      type: 'array',
+      admin: {
+        hidden: true,
+      },
+      fields: [
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'navSyncLastSyncedPageUrls',
+      type: 'array',
+      admin: {
+        hidden: true,
+      },
+      fields: [
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
 
     // ── CTA Button ──
     {

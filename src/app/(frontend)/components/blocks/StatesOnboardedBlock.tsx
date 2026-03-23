@@ -34,15 +34,15 @@ export default function StatesOnboardedBlock({ heading, description, states }: S
         : 'grid md:grid-cols-2 lg:grid-cols-3 gap-6'
 
   return (
-    <section className="py-20 px-6 bg-gray-50">
+    <section className="states-onboarded py-20 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#1f2937] tracking-tight mb-4">
+          <h2 className="states-onboarded__title text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
             {heading}
           </h2>
           {description && (
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="states-onboarded__description text-lg leading-relaxed">
               {description}
             </p>
           )}
@@ -62,10 +62,9 @@ export default function StatesOnboardedBlock({ heading, description, states }: S
                 href={state.portalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative block rounded-2xl overflow-hidden bg-white hover:bg-white text-left transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-100"
+                className="states-onboarded__card group relative block rounded-2xl overflow-hidden text-left transition-all duration-300 transform hover:-translate-y-1 focus:outline-none"
                 style={{
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-                  border: '1px solid #f3f4f6',
+                  ['--state-theme-color' as string]: themeColor,
                 }}
               >
                 {/* Decorative top border based on theme color */}
@@ -77,8 +76,8 @@ export default function StatesOnboardedBlock({ heading, description, states }: S
                 {/* Background Image with Gradient Fade */}
                 {bgImgUrl && (
                   <div className="absolute top-0 right-0 bottom-0 w-3/4 md:w-2/3 pointer-events-none z-0">
-                    {/* Stronger gradient mask: solid white on left, smooth fade to transparent on right */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent z-10" />
+                    {/* Gradient mask keeps content legible over image */}
+                    <div className="states-onboarded__image-fade absolute inset-0 z-10" />
                     <Image
                       src={bgImgUrl}
                       alt=""
@@ -93,27 +92,18 @@ export default function StatesOnboardedBlock({ heading, description, states }: S
                 <div className="relative z-10 p-8 sm:p-12 flex flex-col h-full min-h-[220px] md:min-h-[260px] max-w-lg">
                   <div className="flex-1 flex flex-col justify-center">
                     {state.tagline && (
-                      <div
-                        className="text-sm font-bold uppercase tracking-wider mb-3"
-                        style={{ color: themeColor }}
-                      >
+                      <div className="states-onboarded__tagline text-sm font-bold uppercase tracking-wider mb-3">
                         {state.tagline}
                       </div>
                     )}
-                    <h3 className="text-3xl md:text-5xl font-extrabold text-[#111827] mb-6 group-hover:text-gray-800 transition-colors">
+                    <h3 className="states-onboarded__state-name text-3xl md:text-5xl font-extrabold mb-6 transition-colors">
                       {state.stateName}
                     </h3>
                   </div>
 
                   {/* Visit Portal Button */}
                   <div className="mt-4">
-                    <span
-                      className="inline-flex items-center gap-2 font-bold text-sm md:text-base rounded-full py-3 px-8 transition-all duration-300 shadow-sm hover:shadow"
-                      style={{
-                        backgroundColor: `${themeColor}15`,
-                        color: themeColor,
-                      }}
-                    >
+                    <span className="states-onboarded__cta inline-flex items-center gap-2 font-bold text-sm md:text-base rounded-full py-3 px-8 transition-all duration-300 shadow-sm hover:shadow">
                       Visit Portal
                       <svg
                         className="w-4 h-4 transform group-hover:translate-x-1 transition-transform"

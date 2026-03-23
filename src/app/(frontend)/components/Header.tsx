@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -57,7 +57,33 @@ export default function Header({ data }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
+  const headerRef = useRef<HTMLElement | null>(null)
   const pathname = usePathname()
+
+  useEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--site-header-height', `${el.offsetHeight + 10}px`)
+    }
+
+    updateHeight()
+
+    let observer: ResizeObserver | null = null
+    if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
+      observer = new ResizeObserver(updateHeight)
+      observer.observe(el)
+    }
+
+    window.addEventListener('resize', updateHeight)
+
+    return () => {
+      if (observer) observer.disconnect()
+      window.removeEventListener('resize', updateHeight)
+      document.documentElement.style.removeProperty('--site-header-height')
+    }
+  }, [mobileOpen, searchOpen, data.topBar?.enabled, data.navItems?.length])
 
   // Check if a nav item is active based on current path
   const isActive = (url?: string | null) => {
@@ -82,7 +108,8 @@ export default function Header({ data }: HeaderProps) {
         : 'justify-center'
 
   return (
-    <header className="sticky top-0 z-50">
+    <>
+    <header ref={headerRef} className="site-header fixed top-0 left-0 right-0 z-[100] w-full">
       {/* ── Top Bar ── */}
       {data.topBar?.enabled && data.topBar.text && (
         <div
@@ -369,5 +396,6 @@ export default function Header({ data }: HeaderProps) {
         </nav>
       )}
     </header>
+    </>
   )
 }

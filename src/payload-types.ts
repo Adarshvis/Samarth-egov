@@ -70,8 +70,11 @@ export interface Config {
     users: User;
     media: Media;
     pages: Page;
+    news: News;
     resumes: Resume;
     'job-applications': JobApplication;
+    forms: Form;
+    'form-submissions': FormSubmission;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,8 +85,11 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
     resumes: ResumesSelect<false> | ResumesSelect<true>;
     'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
+    'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -600,35 +606,53 @@ export interface Page {
          * Choose between a card grid or a featured spotlight layout
          */
         layout: 'cards' | 'spotlight';
-        articles: {
-          title: string;
+        /**
+         * Choose manual card entry or automatic fetch from News collection.
+         */
+        entryType: 'manual' | 'collection';
+        articles?:
+          | {
+              title: string;
+              /**
+               * Short summary or excerpt
+               */
+              excerpt?: string | null;
+              image?: (number | null) | Media;
+              /**
+               * Category label (e.g. "Update", "Press Release", "Event")
+               */
+              category?: string | null;
+              /**
+               * Published date
+               */
+              date?: string | null;
+              /**
+               * Link to the full article
+               */
+              url?: string | null;
+              /**
+               * Select a Lucide icon
+               */
+              icon?: string | null;
+              /**
+               * Pick a color or enter hex value
+               */
+              categoryColor?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        collectionSource?: {
           /**
-           * Short summary or excerpt
+           * Maximum number of cards to fetch
            */
-          excerpt?: string | null;
-          image?: (number | null) | Media;
+          limit: number;
+          sortBy?: ('latest' | 'oldest') | null;
           /**
-           * Category label (e.g. "Update", "Press Release", "Event")
+           * Optional category filter (exact match)
            */
           category?: string | null;
-          /**
-           * Published date
-           */
-          date?: string | null;
-          /**
-           * Link to the full article
-           */
-          url?: string | null;
-          /**
-           * Select a Lucide icon
-           */
-          icon?: string | null;
-          /**
-           * Pick a color or enter hex value
-           */
-          categoryColor?: string | null;
-          id?: string | null;
-        }[];
+          featuredOnly?: boolean | null;
+        };
         columns?: ('2' | '3') | null;
         bottomLink?: {
           enabled?: boolean | null;
@@ -807,6 +831,25 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'helpSupport';
+      }
+    | {
+        /**
+         * Section heading displayed above this block
+         */
+        sectionHeading?: string | null;
+        /**
+         * Optional description below the heading
+         */
+        sectionDescription?: string | null;
+        headingAlignment?: ('left' | 'center' | 'right') | null;
+        /**
+         * Select a Form Builder form to display in this section.
+         */
+        form: number | Form;
+        maxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'formLayout';
       }
     | {
         /**
@@ -1395,6 +1438,264 @@ export interface Page {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  title?: string | null;
+  fields?:
+    | (
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            defaultValue?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'checkbox';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'country';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'email';
+          }
+        | {
+            message?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'message';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'number';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: string | null;
+            placeholder?: string | null;
+            options?:
+              | {
+                  label: string;
+                  value: string;
+                  id?: string | null;
+                }[]
+              | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'select';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'state';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: string | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'text';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: string | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'textarea';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            /**
+             * Comma-separated list, e.g. application/pdf,image/*
+             */
+            accept?: string | null;
+            maxSizeMB?: number | null;
+            helperText?: string | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'resumeUpload';
+          }
+      )[]
+    | null;
+  submitButtonLabel?: string | null;
+  /**
+   * Choose whether to display an on-page message or redirect to a different page after they submit the form.
+   */
+  confirmationType?: ('message' | 'redirect') | null;
+  confirmationMessage?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  redirect?: {
+    type?: ('reference' | 'custom') | null;
+    reference?: {
+      relationTo: 'pages';
+      value: number | Page;
+    } | null;
+    url?: string | null;
+  };
+  /**
+   * Send custom emails when the form submits. Use comma separated lists to send the same email to multiple recipients. To reference a value from this form, wrap that field's name with double curly brackets, i.e. {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
+   */
+  emails?:
+    | {
+        emailTo?: string | null;
+        cc?: string | null;
+        bcc?: string | null;
+        replyTo?: string | null;
+        emailFrom?: string | null;
+        subject: string;
+        /**
+         * Enter the message that should be sent in this email.
+         */
+        message?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: number;
+  /**
+   * News article headline
+   */
+  title: string;
+  /**
+   * URL-friendly version of title (e.g. "campus-expansion-2025")
+   */
+  slug: string;
+  /**
+   * Brief summary/excerpt shown on news listing pages
+   */
+  excerpt: string;
+  /**
+   * Main image for the news article
+   */
+  featuredImage: number | Media;
+  /**
+   * Category label (e.g. Update, Press Release, Event)
+   */
+  category: string;
+  /**
+   * Main news article content
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Publication date
+   */
+  publishedDate: string;
+  /**
+   * Related tags/keywords for this news article
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Mark as featured news
+   */
+  isFeatured?: boolean | null;
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Uploaded resume/CV files from job applicants
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1434,8 +1735,25 @@ export interface JobApplication {
    */
   jobTitle: string;
   resume: number | Resume;
-  status: 'new' | 'reviewed' | 'shortlisted' | 'rejected';
+  status: 'new' | 'reviewed' | 'shortlisted' | 'rejected' | 'deleted';
   submittedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "form-submissions".
+ */
+export interface FormSubmission {
+  id: number;
+  form: number | Form;
+  submissionData?:
+    | {
+        field: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1476,12 +1794,24 @@ export interface PayloadLockedDocument {
         value: number | Page;
       } | null)
     | ({
+        relationTo: 'news';
+        value: number | News;
+      } | null)
+    | ({
         relationTo: 'resumes';
         value: number | Resume;
       } | null)
     | ({
         relationTo: 'job-applications';
         value: number | JobApplication;
+      } | null)
+    | ({
+        relationTo: 'forms';
+        value: number | Form;
+      } | null)
+    | ({
+        relationTo: 'form-submissions';
+        value: number | FormSubmission;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1784,6 +2114,7 @@ export interface PagesSelect<T extends boolean = true> {
               sectionDescription?: T;
               headingAlignment?: T;
               layout?: T;
+              entryType?: T;
               articles?:
                 | T
                 | {
@@ -1796,6 +2127,14 @@ export interface PagesSelect<T extends boolean = true> {
                     icon?: T;
                     categoryColor?: T;
                     id?: T;
+                  };
+              collectionSource?:
+                | T
+                | {
+                    limit?: T;
+                    sortBy?: T;
+                    category?: T;
+                    featuredOnly?: T;
                   };
               columns?: T;
               bottomLink?:
@@ -1885,6 +2224,17 @@ export interface PagesSelect<T extends boolean = true> {
                   };
               backgroundColor?: T;
               cardBgColor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        formLayout?:
+          | T
+          | {
+              sectionHeading?: T;
+              sectionDescription?: T;
+              headingAlignment?: T;
+              form?: T;
+              maxWidth?: T;
               id?: T;
               blockName?: T;
             };
@@ -2213,6 +2563,29 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  excerpt?: T;
+  featuredImage?: T;
+  category?: T;
+  content?: T;
+  publishedDate?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  isFeatured?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
@@ -2241,6 +2614,169 @@ export interface JobApplicationsSelect<T extends boolean = true> {
   resume?: T;
   status?: T;
   submittedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms_select".
+ */
+export interface FormsSelect<T extends boolean = true> {
+  title?: T;
+  fields?:
+    | T
+    | {
+        checkbox?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              defaultValue?: T;
+              id?: T;
+              blockName?: T;
+            };
+        country?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        email?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        message?:
+          | T
+          | {
+              message?: T;
+              id?: T;
+              blockName?: T;
+            };
+        number?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        select?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              placeholder?: T;
+              options?:
+                | T
+                | {
+                    label?: T;
+                    value?: T;
+                    id?: T;
+                  };
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        state?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        text?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        textarea?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        resumeUpload?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              accept?: T;
+              maxSizeMB?: T;
+              helperText?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  submitButtonLabel?: T;
+  confirmationType?: T;
+  confirmationMessage?: T;
+  redirect?:
+    | T
+    | {
+        type?: T;
+        reference?: T;
+        url?: T;
+      };
+  emails?:
+    | T
+    | {
+        emailTo?: T;
+        cc?: T;
+        bcc?: T;
+        replyTo?: T;
+        emailFrom?: T;
+        subject?: T;
+        message?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "form-submissions_select".
+ */
+export interface FormSubmissionsSelect<T extends boolean = true> {
+  form?: T;
+  submissionData?:
+    | T
+    | {
+        field?: T;
+        value?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2291,8 +2827,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   siteName: string;
-  siteDescription?: string | null;
-  logo?: (number | null) | Media;
   favicon?: (number | null) | Media;
   themeColors?: {
     /**
@@ -2307,11 +2841,22 @@ export interface SiteSetting {
      * Pick accent/highlight color
      */
     accentColor?: string | null;
-  };
-  contact?: {
-    email?: string | null;
-    phone?: string | null;
-    address?: string | null;
+    /**
+     * Main page background color
+     */
+    backgroundColor?: string | null;
+    /**
+     * Card/surface background color
+     */
+    surfaceColor?: string | null;
+    /**
+     * Section muted background color
+     */
+    mutedBackgroundColor?: string | null;
+    /**
+     * Default body text color
+     */
+    textColor?: string | null;
   };
   socialLinks?:
     | {
@@ -2415,6 +2960,18 @@ export interface Header {
         id?: string | null;
       }[]
     | null;
+  navSyncHiddenPageUrls?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  navSyncLastSyncedPageUrls?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   ctaButton?: {
     enabled?: boolean | null;
     label?: string | null;
@@ -2506,8 +3063,6 @@ export interface Footer {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   siteName?: T;
-  siteDescription?: T;
-  logo?: T;
   favicon?: T;
   themeColors?:
     | T
@@ -2515,13 +3070,10 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         primaryColor?: T;
         secondaryColor?: T;
         accentColor?: T;
-      };
-  contact?:
-    | T
-    | {
-        email?: T;
-        phone?: T;
-        address?: T;
+        backgroundColor?: T;
+        surfaceColor?: T;
+        mutedBackgroundColor?: T;
+        textColor?: T;
       };
   socialLinks?:
     | T
@@ -2583,6 +3135,18 @@ export interface HeaderSelect<T extends boolean = true> {
               label?: T;
               id?: T;
             };
+        id?: T;
+      };
+  navSyncHiddenPageUrls?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  navSyncLastSyncedPageUrls?:
+    | T
+    | {
+        url?: T;
         id?: T;
       };
   ctaButton?:

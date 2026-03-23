@@ -1,5 +1,51 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionAfterChangeHook, CollectionConfig } from 'payload'
 import { adminAccess } from '../access/roles'
+
+const autoDeleteWhenMarkedDeleted: CollectionAfterChangeHook = async ({
+  doc,
+  operation,
+  previousDoc,
+  req,
+}) => {
+  if (operation !== 'update') return
+  if (doc?.status !== 'deleted') return
+  if (previousDoc?.status === 'deleted') return
+
+  try {
+    const resumeValue = doc?.resume as unknown
+    let resumeId: number | string | null = null
+
+    if (typeof resumeValue === 'number' || typeof resumeValue === 'string') {
+      resumeId = resumeValue
+    } else if (
+      resumeValue &&
+      typeof resumeValue === 'object' &&
+      'id' in (resumeValue as Record<string, unknown>)
+    ) {
+      const maybeId = (resumeValue as { id?: number | string }).id
+      if (typeof maybeId === 'number' || typeof maybeId === 'string') {
+        resumeId = maybeId
+      }
+    }
+
+    // Delete linked resume first so there is no orphan file on disk.
+    if (resumeId !== null) {
+      await req.payload.delete({
+        collection: 'resumes',
+        id: resumeId,
+        overrideAccess: true,
+      })
+    }
+
+    await req.payload.delete({
+      collection: 'job-applications',
+      id: doc.id,
+      overrideAccess: true,
+    })
+  } catch (err) {
+    req.payload.logger.error(`Failed auto-delete for job application ${String(doc?.id)}: ${String(err)}`)
+  }
+}
 
 export const JobApplications: CollectionConfig = {
   slug: 'job-applications',
@@ -21,6 +67,9 @@ export const JobApplications: CollectionConfig = {
     read: adminAccess,
     update: adminAccess,
     delete: adminAccess,
+  },
+  hooks: {
+    afterChange: [autoDeleteWhenMarkedDeleted],
   },
   fields: [
     {
@@ -67,6 +116,7 @@ export const JobApplications: CollectionConfig = {
         { label: 'Reviewed', value: 'reviewed' },
         { label: 'Shortlisted', value: 'shortlisted' },
         { label: 'Rejected', value: 'rejected' },
+        { label: 'Delete', value: 'deleted' },
       ],
       admin: {
         position: 'sidebar',
