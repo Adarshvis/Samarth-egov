@@ -99,6 +99,35 @@ export const JobApplications: CollectionConfig = {
       },
     },
     {
+      name: 'currentAddress',
+      type: 'text',
+      label: 'Current Address',
+    },
+    {
+      name: 'permanentAddress',
+      type: 'text',
+      label: 'Permanent Address',
+    },
+    {
+      name: 'highestQualification',
+      type: 'text',
+      label: 'Highest Qualification',
+    },
+    {
+      name: 'workStatus',
+      type: 'select',
+      label: 'Work Status',
+      options: [
+        { label: 'Fresher', value: 'fresher' },
+        { label: 'Experienced', value: 'experienced' },
+      ],
+    },
+    {
+      name: 'yearOfExperience',
+      type: 'text',
+      label: 'Year of Experience',
+    },
+    {
       name: 'resume',
       type: 'relationship',
       label: 'Resume / CV',

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
 import RichText from '../ui/RichText'
@@ -98,6 +98,7 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
+  const [selectValues, setSelectValues] = useState<Record<string, string>>({})
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({})
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({})
 
@@ -286,6 +287,23 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
           return getSubmissionValue(values, ['jobTitle', 'positionApplyingFor', 'position'])
         })()
 
+        // Extract additional fields by name/label matching
+        const getFieldByHint = (pattern: RegExp): string => {
+          for (const field of fields) {
+            if (!matchesHint(field, pattern)) continue
+            const value = getFieldValue(field)
+            if (value) return value
+          }
+          return ''
+        }
+
+        const currentAddress = getFieldByHint(/current.?address/i)
+        const permanentAddress = getFieldByHint(/permanent.?address/i)
+        const highestQualification = getFieldByHint(/highest.?qualification|qualification/i)
+        // Work status comes from select field; yearOfExperience from the conditional input
+        const workStatus = getFieldByHint(/work.?status/i) || (values['work-status'] as string || values['workStatus'] as string || '')
+        const yearOfExperience = typeof values['yearOfExperience'] === 'string' ? values['yearOfExperience'] : ''
+
         if (!applicantName || !email || !jobTitle || !resumeFile) {
           setError('Name, email, position, and resume are required.')
           return
@@ -296,6 +314,11 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
         applyFormData.append('email', email)
         applyFormData.append('phone', phone)
         applyFormData.append('jobTitle', jobTitle)
+        if (currentAddress) applyFormData.append('currentAddress', currentAddress)
+        if (permanentAddress) applyFormData.append('permanentAddress', permanentAddress)
+        if (highestQualification) applyFormData.append('highestQualification', highestQualification)
+        if (workStatus) applyFormData.append('workStatus', workStatus)
+        if (yearOfExperience) applyFormData.append('yearOfExperience', yearOfExperience)
         applyFormData.append('resume', resumeFile)
 
         res = await fetch('/api/apply', {
@@ -376,7 +399,7 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
             {fields.map((field, index) => {
               const key = field.id || `${field.blockType}-${field.name || index}`
               const isAlwaysFullWidth =
-                field.blockType === 'message' || field.blockType === 'resumeUpload'
+                field.blockType === 'message' || field.blockType === 'resumeUpload' || field.blockType === 'checkbox'
               const isHalfWidth =
                 !isAlwaysFullWidth &&
                 (field.width === 50 || field.width === undefined || field.width === null)
@@ -457,26 +480,48 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
               }
 
               if (field.blockType === 'select') {
+                const isWorkStatus = /work.?status/i.test(name) || /work.?status/i.test(field.label || '')
+                const currentSelectVal = selectValues[name] || ''
                 return (
-                  <label key={key} className={fieldClass}>
-                    <span className="apply-form__label">
-                      {field.label || name}
-                      {field.required ? <span className="apply-form__required">*</span> : null}
-                    </span>
-                    <select
-                      name={name}
-                      required={Boolean(field.required)}
-                      defaultValue={typeof field.defaultValue === 'string' ? field.defaultValue : ''}
-                      className="apply-form__input"
-                    >
-                      <option value="">{field.placeholder || 'Select an option'}</option>
-                      {(field.options || []).map((option) => (
-                        <option key={`${name}-${option.value}`} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <React.Fragment key={key}>
+                    <label className={fieldClass}>
+                      <span className="apply-form__label">
+                        {field.label || name}
+                        {field.required ? <span className="apply-form__required">*</span> : null}
+                      </span>
+                      <select
+                        name={name}
+                        required={Boolean(field.required)}
+                        value={currentSelectVal}
+                        onChange={(e) => setSelectValues((prev) => ({ ...prev, [name]: e.target.value }))}
+                        className="apply-form__input"
+                      >
+                        <option value="">{field.placeholder || 'Select an option'}</option>
+                        {(field.options || []).map((option) => (
+                          <option key={`${name}-${option.value}`} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {isWorkStatus && currentSelectVal.toLowerCase() === 'experienced' && (
+                      <label className={fieldClass}>
+                        <span className="apply-form__label">
+                          Year of Experience
+                          <span className="apply-form__required">*</span>
+                        </span>
+                        <input
+                          type="number"
+                          name="yearOfExperience"
+                          required
+                          min="1"
+                          max="50"
+                          placeholder="Enter Year of Experience"
+                          className="apply-form__input"
+                        />
+                      </label>
+                    )}
+                  </React.Fragment>
                 )
               }
 

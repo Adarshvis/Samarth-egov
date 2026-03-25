@@ -8,9 +8,11 @@ interface Application {
   email?: string | null
   phone?: string | null
   jobTitle?: string | null
+  highestQualification?: string | null
   status?: string | null
   createdAt?: string | null
   resume?: { id: string; filename?: string | null; url?: string | null } | null
+  extraData?: Record<string, unknown> | null
 }
 
 interface Stats {
@@ -44,6 +46,60 @@ function formatDate(iso: string | null | undefined) {
   const d = new Date(iso)
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
   return `${String(d.getUTCDate()).padStart(2, '0')} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
+function getHighestQualification(app: Application): string {
+  const direct = app.highestQualification
+  if (typeof direct === 'string' && direct.trim()) return direct.trim()
+
+  const extra = app.extraData
+  if (!extra || typeof extra !== 'object') return '—'
+
+  const candidates = [
+    'highestQualification',
+    'highest_qualification',
+    'highest qualification',
+    'highestEducation',
+    'qualification',
+  ]
+
+  for (const key of candidates) {
+    const value = (extra as Record<string, unknown>)[key]
+    if (typeof value === 'string' && value.trim()) return value.trim()
+  }
+
+  return '—'
+}
+
+function flattenExportRecord(value: unknown, prefix = '', out: Record<string, string> = {}) {
+  if (value === null || value === undefined) {
+    if (prefix) out[prefix] = ''
+    return out
+  }
+
+  if (Array.isArray(value)) {
+    out[prefix] = value
+      .map((item) => (typeof item === 'object' && item !== null ? JSON.stringify(item) : String(item)))
+      .join(' | ')
+    return out
+  }
+
+  if (typeof value === 'object') {
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+      const nextPrefix = prefix ? `${prefix}.${key}` : key
+      flattenExportRecord(nested, nextPrefix, out)
+    }
+    return out
+  }
+
+  out[prefix] = String(value)
+  return out
+}
+
+function csvEscape(value: string) {
+  const needsQuotes = /[",\n]/.test(value)
+  if (!needsQuotes) return value
+  return `"${value.replace(/"/g, '""')}"`
 }
 
 
@@ -107,6 +163,78 @@ export default function ApplicationsDashboardClient({
     { label: 'Rejected', value: stats.rejected, color: '#ef4444', icon: '❌' },
   ]
 
+  function downloadFile(content: string, fileName: string, mimeType: string) {
+    const blob = new Blob([content], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  function handleExport(format: 'csv' | 'excel') {
+    if (!applications.length) return
+
+    const flattenedRows = applications.map((app) => {
+      const record = flattenExportRecord(app)
+      record.highestQualification = getHighestQualification(app)
+      if (app.createdAt) record.submittedDate = formatDate(app.createdAt)
+      delete record.createdAt
+      for (const key of Object.keys(record)) {
+        if (key === 'resume' || key.startsWith('resume.')) {
+          delete record[key]
+        }
+      }
+      return record
+    })
+
+    const preferredHeaders = [
+      'id',
+      'applicantName',
+      'jobTitle',
+      'highestQualification',
+      'email',
+      'phone',
+      'status',
+      'submittedDate',
+    ]
+
+    const allHeaders = Array.from(
+      new Set(flattenedRows.flatMap((row) => Object.keys(row))),
+    ).filter((h) => h !== 'resume' && !h.startsWith('resume.'))
+
+    const orderedHeaders = [
+      ...preferredHeaders.filter((h) => allHeaders.includes(h)),
+      ...allHeaders.filter((h) => !preferredHeaders.includes(h)).sort(),
+    ]
+
+    if (format === 'csv') {
+      const lines = [orderedHeaders.join(',')]
+      for (const row of flattenedRows) {
+        const values = orderedHeaders.map((header) => csvEscape(row[header] || ''))
+        lines.push(values.join(','))
+      }
+
+      downloadFile(lines.join('\n'), `applications-${Date.now()}.csv`, 'text/csv;charset=utf-8')
+      return
+    }
+
+    const tsvLines = [orderedHeaders.join('\t')]
+    for (const row of flattenedRows) {
+      const values = orderedHeaders.map((header) => (row[header] || '').replace(/\t/g, ' '))
+      tsvLines.push(values.join('\t'))
+    }
+
+    downloadFile(
+      tsvLines.join('\n'),
+      `applications-${Date.now()}.xls`,
+      'application/vnd.ms-excel;charset=utf-8',
+    )
+  }
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'inherit' }}>
       {/* Header */}
@@ -128,22 +256,56 @@ export default function ApplicationsDashboardClient({
             Review and manage all job applications
           </p>
         </div>
-        <button
-          onClick={() => window.open('/admin/collections/job-applications/create', '_self')}
-          style={{
-            background: '#1e3a5f',
-            color: '#fff',
-            padding: '0.6rem 1.25rem',
-            borderRadius: '0.5rem',
-            border: 'none',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-          }}
-        >
-          + New Application
-        </button>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => handleExport('csv')}
+            style={{
+              background: '#f8fafc',
+              color: '#1e3a5f',
+              padding: '0.6rem 1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid #dce4ef',
+              fontSize: '0.825rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            Export CSV
+          </button>
+          <button
+            onClick={() => handleExport('excel')}
+            style={{
+              background: '#f8fafc',
+              color: '#1e3a5f',
+              padding: '0.6rem 1rem',
+              borderRadius: '0.5rem',
+              border: '1px solid #dce4ef',
+              fontSize: '0.825rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            Export Excel
+          </button>
+          <button
+            onClick={() => window.open('/admin/collections/job-applications/create', '_self')}
+            style={{
+              background: '#1e3a5f',
+              color: '#fff',
+              padding: '0.6rem 1.25rem',
+              borderRadius: '0.5rem',
+              border: 'none',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            + New Application
+          </button>
+        </div>
       </div>
 
       {/* Stat Cards */}
@@ -267,7 +429,7 @@ export default function ApplicationsDashboardClient({
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                {['Applicant', 'Position', 'Contact', 'Date', 'Status', 'Resume'].map((h) => (
+                {['Applicant', 'Position', 'Contact', 'Highest Qualification', 'Status', 'Resume'].map((h) => (
                   <th
                     key={h}
                     style={{
@@ -335,10 +497,10 @@ export default function ApplicationsDashboardClient({
                       )}
                     </td>
 
-                    {/* Date */}
+                    {/* Highest Qualification */}
                     <td style={{ padding: '0.875rem 1rem' }}>
                       <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
-                        {formatDate(app.createdAt)}
+                        {getHighestQualification(app)}
                       </span>
                     </td>
 

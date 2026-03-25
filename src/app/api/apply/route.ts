@@ -16,8 +16,13 @@ export async function POST(req: NextRequest) {
 
     const applicantName = getValue(['applicantName', 'fullName', 'name'])
     const email = getValue(['email'])
-    const phone = getValue(['phone', 'phoneNumber', 'mobile'])
-    const jobTitle = getValue(['jobTitle', 'positionApplyingFor', 'position', 'select', 'role'])
+    const phone = getValue(['phone', 'phoneNumber', 'mobile', 'mobileNumber'])
+    const jobTitle = getValue(['jobTitle', 'applyingFor', 'positionApplyingFor', 'position', 'role'])
+    const currentAddress = getValue(['currentAddress', 'current_address', 'current-address'])
+    const permanentAddress = getValue(['permanentAddress', 'permanent_address', 'permanent-address'])
+    const highestQualification = getValue(['highestQualification', 'highest_qualification', 'qualification'])
+    const workStatus = getValue(['workStatus', 'work_status', 'work-status'])
+    const yearOfExperience = getValue(['yearOfExperience', 'year_of_experience', 'yearsOfExperience'])
     const file = formData.get('resume') as File | null
 
     // Basic validation
@@ -58,7 +63,7 @@ export async function POST(req: NextRequest) {
       overrideAccess: true,
     })
 
-    // Create the job application record
+    // Create the job application record with all fields
     await payload.create({
       collection: 'job-applications' as any,
       data: {
@@ -66,6 +71,11 @@ export async function POST(req: NextRequest) {
         email,
         phone: phone || undefined,
         jobTitle,
+        currentAddress: currentAddress || undefined,
+        permanentAddress: permanentAddress || undefined,
+        highestQualification: highestQualification || undefined,
+        workStatus: workStatus ? workStatus.toLowerCase() : undefined,
+        yearOfExperience: yearOfExperience || undefined,
         resume: resumeDoc.id,
         status: 'new',
         submittedAt: new Date().toISOString(),

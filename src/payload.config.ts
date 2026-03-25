@@ -19,8 +19,28 @@ import { Footer } from './globals/Footer'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const databaseUrl = process.env.CMS_DATABASE_URL || ''
+
+function maskDatabaseUrl(value: string): string {
+  if (!value) return '<empty>'
+
+  try {
+    const parsed = new URL(value)
+    const user = parsed.username || '<user>'
+    const host = parsed.hostname || '<host>'
+    const port = parsed.port || '<port>'
+    const dbName = parsed.pathname?.replace(/^\//, '') || '<db>'
+    return `${parsed.protocol}//${user}:***@${host}:${port}/${dbName}`
+  } catch {
+    return '<invalid-url>'
+  }
+}
 
 export default buildConfig({
+  onInit: async (payload) => {
+    payload.logger.info('[DB] Payload initialized')
+    payload.logger.info(`[DB] CMS_DATABASE_URL=${maskDatabaseUrl(databaseUrl)}`)
+  },
   admin: {
     user: Users.slug,
     importMap: {
@@ -45,8 +65,9 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.CMS_DATABASE_URL || '',
+      connectionString: databaseUrl,
     },
+    push: false,
   }),
   sharp,
   plugins: [

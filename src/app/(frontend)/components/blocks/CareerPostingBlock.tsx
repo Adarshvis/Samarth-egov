@@ -150,7 +150,7 @@ export default function CareerPostingBlock({
       {hasApplyButton && (
         <div className="career-posting__apply">
           <a
-            href={applyButtonLink || '/apply'}
+            href={applyButtonLink || '/applicant/login'}
             className="career-posting__apply-btn"
           >
             {applyButtonText}

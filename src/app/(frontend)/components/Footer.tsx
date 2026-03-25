@@ -92,13 +92,13 @@ export default function Footer({ data, siteSettings }: FooterProps) {
 
       {/* ── Main Footer Body ── */}
       <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '2.5rem 2rem' }}>
-        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div className="footer-columns" style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
 
           {/* Nav columns grouped together */}
           {data.columns && data.columns.length > 0 && (
             <div style={{ display: 'flex', gap: '2.5rem', flex: '2 1 auto', flexWrap: 'wrap' }}>
               {data.columns.map((col) => (
-                <div key={col.id || col.heading} style={{ flex: '1 1 140px' }}>
+                <div key={col.id || col.heading} className="footer-col" style={{ flex: '1 1 140px' }}>
                   {col.heading && (
                     <h3 style={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem', marginBottom: '1rem', borderBottom: '2px solid rgba(255,255,255,0.2)', paddingBottom: '0.5rem' }}>
                       {col.heading}
@@ -125,7 +125,7 @@ export default function Footer({ data, siteSettings }: FooterProps) {
 
           {/* Contact Us */}
           {hasContact && (
-            <div style={{ flex: '1 1 180px' }}>
+            <div className="footer-col" style={{ flex: '1 1 180px' }}>
               <h3 style={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem', marginBottom: '1rem', borderBottom: '2px solid rgba(255,255,255,0.2)', paddingBottom: '0.5rem' }}>
                 Contact Us
               </h3>
@@ -155,7 +155,7 @@ export default function Footer({ data, siteSettings }: FooterProps) {
 
           {/* Social Media */}
           {hasSocial && (
-            <div style={{ flex: '0 1 140px' }}>
+            <div className="footer-col" style={{ flex: '0 1 140px' }}>
               <h3 style={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem', marginBottom: '1rem', borderBottom: '2px solid rgba(255,255,255,0.2)', paddingBottom: '0.5rem' }}>
                 Social Media
               </h3>

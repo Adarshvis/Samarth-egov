@@ -1734,6 +1734,11 @@ export interface JobApplication {
    * The position the candidate indicated they are applying for
    */
   jobTitle: string;
+  currentAddress?: string | null;
+  permanentAddress?: string | null;
+  highestQualification?: string | null;
+  workStatus?: ('fresher' | 'experienced') | null;
+  yearOfExperience?: string | null;
   resume: number | Resume;
   status: 'new' | 'reviewed' | 'shortlisted' | 'rejected' | 'deleted';
   submittedAt?: string | null;
@@ -2611,6 +2616,11 @@ export interface JobApplicationsSelect<T extends boolean = true> {
   email?: T;
   phone?: T;
   jobTitle?: T;
+  currentAddress?: T;
+  permanentAddress?: T;
+  highestQualification?: T;
+  workStatus?: T;
+  yearOfExperience?: T;
   resume?: T;
   status?: T;
   submittedAt?: T;
