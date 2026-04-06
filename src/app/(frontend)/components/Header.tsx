@@ -93,12 +93,8 @@ export default function Header({ data }: HeaderProps) {
   }
 
   const leftImg = typeof data.leftLogo?.image === 'object' && data.leftLogo.image?.url ? data.leftLogo.image : null
-  const centerImg = typeof data.centerLogo?.image === 'object' && data.centerLogo.image?.url ? data.centerLogo.image : null
-
   const leftHeight = data.leftLogo?.height || 50
   const leftMaxWidth = data.leftLogo?.maxWidth || 200
-  const centerHeight = data.centerLogo?.height || 60
-  const centerMaxWidth = data.centerLogo?.maxWidth || 300
   const navAlignment = data.navAlignment || 'center'
   const navAlignWrapperClass =
     navAlignment === 'left'
@@ -120,7 +116,7 @@ export default function Header({ data }: HeaderProps) {
         </div>
       )}
 
-      {/* ── Main Header: Left Logo | Center Logo + Text | Search ── */}
+      {/* ── Main Header: Left Logo | Center Menu | Search ── */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           {/* Left Logo */}
@@ -141,34 +137,105 @@ export default function Header({ data }: HeaderProps) {
             )}
           </div>
 
-          {/* Center Logo + Title */}
-          <div className="flex-1 flex items-center justify-center gap-3">
-            {centerImg?.url && (
-              <a href={data.centerLogo?.url || '#'} className="shrink-0">
-                <Image
-                  src={centerImg.url}
-                  alt={centerImg.alt || 'Ministry Logo'}
-                  width={centerMaxWidth}
-                  height={centerHeight}
-                  style={{ height: `${centerHeight}px`, width: 'auto', maxWidth: `${centerMaxWidth}px` }}
-                  className="object-contain"
-                />
-              </a>
-            )}
-            {(data.centerLogo?.title || data.centerLogo?.subtitle) && (
-              <div className="hidden sm:block text-center">
-                {data.centerLogo.title && (
-                  <div className="text-gray-900 font-semibold text-sm md:text-base leading-tight">
-                    {data.centerLogo.title}
+          {/* Center Desktop Navigation */}
+          <div className={`hidden md:flex flex-1 items-center ${navAlignWrapperClass}`}>
+            <div className="flex items-center gap-8">
+              {(data.navItems || []).map((item) => {
+                const hasChildren = item.children && item.children.length > 0
+                const active = hasChildren
+                  ? item.children?.some((child) => {
+                      const slug = child.page?.slug
+                      return isActive(slug === 'home' ? '/' : `/${slug}`)
+                    }) || false
+                  : isActive(item.url)
+
+                return (
+                  <div key={item.id || item.label} className="relative group">
+                    {!hasChildren ? (
+                      <a
+                        href={item.url || '#'}
+                        onMouseEnter={() => setHoveredNav(item.id || item.label)}
+                        onMouseLeave={() => setHoveredNav(null)}
+                        className="inline-flex items-center text-base font-medium pb-1 border-b-[3px]"
+                        style={{
+                          color: hoveredNav === (item.id || item.label)
+                            ? '#FFAA01'
+                            : active
+                              ? '#1A73E9'
+                              : '#000000',
+                          borderColor: hoveredNav === (item.id || item.label)
+                            ? '#FFAA01'
+                            : active
+                              ? '#1A73E9'
+                              : 'transparent',
+                          transition: 'color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease',
+                          transform: hoveredNav === (item.id || item.label) ? 'translateY(-1px)' : 'translateY(0)',
+                        }}
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <>
+                        <button
+                          onMouseEnter={() => setHoveredNav(item.id || item.label)}
+                          onMouseLeave={() => setHoveredNav(null)}
+                          className="inline-flex items-center gap-1 text-base font-medium pb-1 border-b-[3px]"
+                          style={{
+                            color: hoveredNav === (item.id || item.label)
+                              ? '#FFAA01'
+                              : active
+                                ? '#1A73E9'
+                                : '#000000',
+                            borderColor: hoveredNav === (item.id || item.label)
+                              ? '#FFAA01'
+                              : active
+                                ? '#1A73E9'
+                                : 'transparent',
+                            transition: 'color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease',
+                            transform: hoveredNav === (item.id || item.label) ? 'translateY(-1px)' : 'translateY(0)',
+                          }}
+                        >
+                          {item.label}
+                          <ChevronDown size={14} />
+                        </button>
+                        {item.children && item.children.length > 0 && (
+                          <div className="absolute top-full left-0 mt-0 bg-white rounded-b-lg shadow-lg border border-gray-200 py-1 min-w-[200px] hidden group-hover:block z-50">
+                            {item.children.map((child) => {
+                              const childSlug = child.page?.slug
+                              const childUrl = childSlug === 'home' ? '/' : `/${childSlug}`
+                              const childLabel = child.label || child.page?.title || ''
+                              const childActive = isActive(childUrl)
+                              return (
+                                <a
+                                  key={child.id || childLabel}
+                                  href={childUrl}
+                                  className={`block px-4 py-2 text-base transition-colors ${
+                                    childActive
+                                      ? 'text-[#1A73E9] font-semibold'
+                                      : 'text-gray-900 hover:text-[#1A73E9] hover:bg-gray-50'
+                                  }`}
+                                >
+                                  {childLabel}
+                                </a>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
-                )}
-                {data.centerLogo.subtitle && (
-                  <div className="text-gray-500 text-xs md:text-sm leading-tight">
-                    {data.centerLogo.subtitle}
-                  </div>
-                )}
-              </div>
-            )}
+                )
+              })}
+
+              {data.ctaButton?.enabled && data.ctaButton.label && (
+                <a
+                  href={data.ctaButton.url || '#'}
+                  className="bg-blue-600 text-white text-sm font-medium px-4 py-1.5 rounded hover:bg-blue-700 transition-colors"
+                >
+                  {data.ctaButton.label}
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Right: Search Bar + Mobile Toggle */}
@@ -222,113 +289,9 @@ export default function Header({ data }: HeaderProps) {
         )}
       </div>
 
-      {/* ── Navigation Bar ── */}
+      {/* ── Mobile Navigation Bar ── */}
       {data.navItems && data.navItems.length > 0 && (
-        <nav className="bg-white border-b border-gray-200 pb-[5px]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="hidden md:flex items-center gap-4">
-              <div className={`flex-1 flex items-center ${navAlignWrapperClass}`}>
-                <div className="flex items-center gap-8">
-                  {data.navItems.map((item) => {
-                    const hasChildren = item.children && item.children.length > 0
-                    const active = hasChildren
-                      ? item.children?.some((child) => {
-                          const slug = child.page?.slug
-                          return isActive(slug === 'home' ? '/' : `/${slug}`)
-                        }) || false
-                      : isActive(item.url)
-
-                    return (
-                      <div key={item.id || item.label} className="relative group">
-                        {!hasChildren ? (
-                          <a
-                            href={item.url || '#'}
-                            onMouseEnter={() => setHoveredNav(item.id || item.label)}
-                            onMouseLeave={() => setHoveredNav(null)}
-                            className="inline-flex items-center text-base font-medium pb-1 border-b-[3px]"
-                            style={{
-                              color: hoveredNav === (item.id || item.label)
-                                ? '#FFAA01'
-                                : active
-                                  ? '#1A73E9'
-                                  : '#000000',
-                              borderColor: hoveredNav === (item.id || item.label)
-                                ? '#FFAA01'
-                                : active
-                                  ? '#1A73E9'
-                                  : 'transparent',
-                              transition: 'color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease',
-                              transform: hoveredNav === (item.id || item.label) ? 'translateY(-1px)' : 'translateY(0)',
-                            }}
-                          >
-                            {item.label}
-                          </a>
-                        ) : (
-                          <>
-                            <button
-                              onMouseEnter={() => setHoveredNav(item.id || item.label)}
-                              onMouseLeave={() => setHoveredNav(null)}
-                              className="inline-flex items-center gap-1 text-base font-medium pb-1 border-b-[3px]"
-                              style={{
-                                color: hoveredNav === (item.id || item.label)
-                                  ? '#FFAA01'
-                                  : active
-                                    ? '#1A73E9'
-                                    : '#000000',
-                                borderColor: hoveredNav === (item.id || item.label)
-                                  ? '#FFAA01'
-                                  : active
-                                    ? '#1A73E9'
-                                    : 'transparent',
-                                transition: 'color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease',
-                                transform: hoveredNav === (item.id || item.label) ? 'translateY(-1px)' : 'translateY(0)',
-                              }}
-                            >
-                              {item.label}
-                              <ChevronDown size={14} />
-                            </button>
-                            {item.children && item.children.length > 0 && (
-                              <div className="absolute top-full left-0 mt-0 bg-white rounded-b-lg shadow-lg border border-gray-200 py-1 min-w-[200px] hidden group-hover:block z-50">
-                                {item.children.map((child) => {
-                                  const childSlug = child.page?.slug
-                                  const childUrl = childSlug === 'home' ? '/' : `/${childSlug}`
-                                  const childLabel = child.label || child.page?.title || ''
-                                  const childActive = isActive(childUrl)
-                                  return (
-                                    <a
-                                      key={child.id || childLabel}
-                                      href={childUrl}
-                                      className={`block px-4 py-2 text-base transition-colors ${
-                                        childActive
-                                          ? 'text-[#1A73E9] font-semibold'
-                                          : 'text-gray-900 hover:text-[#1A73E9] hover:bg-gray-50'
-                                      }`}
-                                    >
-                                      {childLabel}
-                                    </a>
-                                  )
-                                })}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* CTA in navbar */}
-              {data.ctaButton?.enabled && data.ctaButton.label && (
-                <a
-                  href={data.ctaButton.url || '#'}
-                  className="bg-blue-600 text-white text-sm font-medium px-4 py-1.5 rounded hover:bg-blue-700 transition-colors"
-                >
-                  {data.ctaButton.label}
-                </a>
-              )}
-            </div>
-          </div>
+        <nav className="md:hidden bg-white border-b border-gray-200 pb-[5px]">
 
           {/* Mobile Nav */}
           {mobileOpen && (
