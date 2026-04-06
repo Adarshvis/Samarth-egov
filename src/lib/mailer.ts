@@ -13,7 +13,7 @@ function createTransporter() {
 }
 
 const senderEmail = process.env.SMTP_SENDER_EMAIL || 'cps@uod.ac.in'
-const FROM = `No Reply <${senderEmail}>`
+const FROM = `SamarthX <${senderEmail}>`
 
 export async function sendOtpEmail(to: string, otp: string): Promise<void> {
   const transporter = createTransporter()

@@ -1,6 +1,11 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  AlignFeature,
+  lexicalEditor,
+  EXPERIMENTAL_TableFeature,
+  TextStateFeature,
+} from '@payloadcms/richtext-lexical'
 import { HighlightColorFeature, TextColorFeature } from 'payloadcms-lexical-ext'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -55,8 +60,21 @@ export default buildConfig({
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
+      AlignFeature(),
+      TextStateFeature({
+        state: {
+          fontSize: {
+            sm: { label: 'Small', css: { 'font-size': '0.875rem' } },
+            base: { label: 'Normal', css: { 'font-size': '1rem' } },
+            lg: { label: 'Large', css: { 'font-size': '1.125rem' } },
+            xl: { label: 'XL', css: { 'font-size': '1.25rem' } },
+            '2xl': { label: '2XL', css: { 'font-size': '1.5rem' } },
+          },
+        },
+      }),
       TextColorFeature(),
       HighlightColorFeature(),
+      EXPERIMENTAL_TableFeature(),
     ],
   }),
   secret: process.env.PAYLOAD_SECRET || '',
