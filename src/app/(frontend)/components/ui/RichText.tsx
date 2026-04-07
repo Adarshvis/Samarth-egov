@@ -90,31 +90,34 @@ type RichTextProps = {
 }
 
 export default function RichText(props: RichTextProps) {
-  const userConverters = props?.converters
+  const { converters: userConverters, className, ...restProps } = props
+  const wrapperClassName = ['cms-richtext', className].filter(Boolean).join(' ')
 
   return (
-    <PayloadRichText
-      {...props}
-      converters={(args: any) => {
-        const defaultConverters = args?.defaultConverters || {}
+    <div className={wrapperClassName}>
+      <PayloadRichText
+        {...restProps}
+        converters={(args: any) => {
+          const defaultConverters = args?.defaultConverters || {}
 
-        const pluginConverters = {
-          ...defaultConverters,
-          ...lexicalExtJSXConverters,
-        }
+          const pluginConverters = {
+            ...defaultConverters,
+            ...lexicalExtJSXConverters,
+          }
 
-        if (!userConverters) return pluginConverters
+          if (!userConverters) return pluginConverters
 
-        if (typeof userConverters === 'function') {
-          const resolved = userConverters({ ...args, defaultConverters: pluginConverters })
-          return resolved || pluginConverters
-        }
+          if (typeof userConverters === 'function') {
+            const resolved = userConverters({ ...args, defaultConverters: pluginConverters })
+            return resolved || pluginConverters
+          }
 
-        return {
-          ...pluginConverters,
-          ...userConverters,
-        }
-      }}
-    />
+          return {
+            ...pluginConverters,
+            ...userConverters,
+          }
+        }}
+      />
+    </div>
   )
 }

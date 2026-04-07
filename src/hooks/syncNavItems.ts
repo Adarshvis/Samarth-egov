@@ -40,7 +40,7 @@ async function syncNavToHeader(payload: any) {
     collection: 'pages',
     where: { showInNav: { equals: true }, status: { equals: 'published' } },
     sort: ['navOrder', 'createdAt'],
-    limit: 100,
+    limit: 1000,
     depth: 0
   })
   const activePageUrls = new Set(
@@ -63,6 +63,13 @@ async function syncNavToHeader(payload: any) {
   // If admin adds a previously hidden page URL back manually, unhide it.
   for (const url of currentPageUrlsInNav) {
     hiddenPageUrls.delete(url)
+  }
+
+  // If a page is newly eligible for sync, do not keep stale hidden state.
+  for (const url of activePageUrls) {
+    if (!lastSyncedPageUrls.has(url)) {
+      hiddenPageUrls.delete(url)
+    }
   }
 
   // Keep hidden list clean by retaining only currently active page URLs.

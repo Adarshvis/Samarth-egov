@@ -838,9 +838,23 @@ export interface Page {
          */
         sectionHeading?: string | null;
         /**
-         * Optional description below the heading
+         * Optional rich-text description below the heading
          */
-        sectionDescription?: string | null;
+        sectionDescription?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         headingAlignment?: ('left' | 'center' | 'right') | null;
         /**
          * Select a Form Builder form to display in this section.

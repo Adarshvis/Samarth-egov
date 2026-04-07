@@ -1,11 +1,33 @@
 import type { Block } from 'payload'
-import { sectionHeadingFields } from './shared'
 
 export const FormLayout: Block = {
   slug: 'formLayout',
   labels: { singular: 'Form', plural: 'Forms' },
   fields: [
-    ...sectionHeadingFields,
+    {
+      name: 'sectionHeading',
+      type: 'text',
+      admin: {
+        description: 'Section heading displayed above this block',
+      },
+    },
+    {
+      name: 'sectionDescription',
+      type: 'richText',
+      admin: {
+        description: 'Optional rich-text description below the heading',
+      },
+    },
+    {
+      name: 'headingAlignment',
+      type: 'select',
+      defaultValue: 'center',
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Center', value: 'center' },
+        { label: 'Right', value: 'right' },
+      ],
+    },
     {
       name: 'form',
       type: 'relationship',
