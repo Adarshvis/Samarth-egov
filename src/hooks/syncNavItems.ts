@@ -17,11 +17,23 @@ async function syncNavToHeader(payload: any) {
 
   // 2. Fetch all pages so we can distinguish between page links and manual external links
   const allPages = await payload.find({ collection: 'pages', limit: 1000, depth: 0 })
+  const allPageIds = new Set(allPages.docs.map((p: any) => p.id))
   const allPageUrls = new Set(allPages.docs.map((p: any) => p.slug === 'home' ? '/' : `/${p.slug}`))
 
   // 3. Filter out existing nav items that belong to pages (we will rebuild them). 
   // This leaves behind completely manual/external links so they don't get deleted!
   const manualNavItems = existingNav.filter((item: any) => !allPageUrls.has(item.url))
+
+  const sanitizeChildren = (children: any[] | null | undefined) => {
+    if (!Array.isArray(children)) return []
+    return children.filter((child) => {
+      const pageRef = child?.page
+      if (typeof pageRef === 'number') return allPageIds.has(pageRef)
+      if (typeof pageRef === 'string') return allPageIds.has(Number(pageRef)) || allPageIds.has(pageRef)
+      if (pageRef && typeof pageRef === 'object' && 'id' in pageRef) return allPageIds.has(pageRef.id)
+      return false
+    })
+  }
 
   // 4. Fetch the pages that SHOULD be in the nav
   const activePages = await payload.find({
@@ -64,7 +76,7 @@ async function syncNavToHeader(payload: any) {
     return {
       label: page.title,
       url: url,
-      children: previousItem?.children || [], // Keep the submenus the admin built in the Header global!
+      children: sanitizeChildren(previousItem?.children), // Keep valid submenus only.
     }
   }).filter((item: any) => !nextHiddenSet.has(item.url))
 

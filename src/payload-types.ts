@@ -891,20 +891,60 @@ export interface Page {
          */
         sectionDescription?: string | null;
         headingAlignment?: ('left' | 'center' | 'right') | null;
+        /**
+         * Choose how cards should be displayed.
+         */
+        cardLayout?: ('classic' | 'minimal' | 'split' | 'accentTop') | null;
         columns?: ('2' | '3' | '4') | null;
-        cards: {
-          /**
-           * Select a Lucide icon
-           */
-          icon?: string | null;
-          title: string;
-          description?: string | null;
-          /**
-           * Optional URL this card links to
-           */
-          link?: string | null;
-          id?: string | null;
-        }[];
+        cards?:
+          | {
+              /**
+               * Select a Lucide icon
+               */
+              icon?: string | null;
+              /**
+               * Optional card title (rich text supported).
+               */
+              title?: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              } | null;
+              /**
+               * Optional card description/details (rich text supported).
+               */
+              description?: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              } | null;
+              /**
+               * Optional URL this card links to
+               */
+              link?: string | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'featureCards';
@@ -2260,6 +2300,7 @@ export interface PagesSelect<T extends boolean = true> {
               sectionHeading?: T;
               sectionDescription?: T;
               headingAlignment?: T;
+              cardLayout?: T;
               columns?: T;
               cards?:
                 | T

@@ -7,6 +7,20 @@ export const FeatureCards: Block = {
   fields: [
     ...sectionHeadingFields,
     {
+      name: 'cardLayout',
+      type: 'select',
+      defaultValue: 'classic',
+      options: [
+        { label: 'Classic', value: 'classic' },
+        { label: 'Minimal', value: 'minimal' },
+        { label: 'Split', value: 'split' },
+        { label: 'Accent Top', value: 'accentTop' },
+      ],
+      admin: {
+        description: 'Choose how cards should be displayed.',
+      },
+    },
+    {
       name: 'columns',
       type: 'select',
       defaultValue: '3',
@@ -19,17 +33,21 @@ export const FeatureCards: Block = {
     {
       name: 'cards',
       type: 'array',
-      required: true,
       fields: [
         iconField('icon', 'Card Icon'),
         {
           name: 'title',
-          type: 'text',
-          required: true,
+          type: 'richText',
+          admin: {
+            description: 'Optional card title (rich text supported).',
+          },
         },
         {
           name: 'description',
-          type: 'textarea',
+          type: 'richText',
+          admin: {
+            description: 'Optional card description/details (rich text supported).',
+          },
         },
         {
           name: 'link',
