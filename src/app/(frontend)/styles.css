@@ -917,11 +917,13 @@ body {
   border-radius: 1rem;
   box-shadow: 0 2px 16px rgb(0 0 0 / 8%);
   max-width: 46rem;
+  width: 100%;
   margin: 0 auto;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
+  overflow-x: hidden;
 }
 
 .apply-form__error-banner {
@@ -938,7 +940,7 @@ body {
 
 .apply-form__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -952,6 +954,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  min-width: 0;
+  width: 100%;
 }
 
 .apply-form__field--full {
@@ -979,6 +983,8 @@ body {
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
   background: var(--bg-surface);
+  width: 100%;
+  max-width: 100%;
 }
 
 .apply-form__input:focus {
