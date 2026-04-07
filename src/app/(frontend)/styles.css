@@ -948,6 +948,13 @@ body {
   .apply-form__grid {
     grid-template-columns: 1fr;
   }
+
+  .apply-form__custom-select-panel {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    top: auto;
+  }
 }
 
 .apply-form__field {
@@ -994,6 +1001,108 @@ body {
 
 .apply-form__input::placeholder {
   color: color-mix(in srgb, var(--text-main) 45%, transparent);
+}
+
+.apply-form__native-select-proxy {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.apply-form__custom-select {
+  position: relative;
+}
+
+.apply-form__custom-select-trigger {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--text-main) 18%, transparent);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.875rem;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.apply-form__custom-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 20%, transparent);
+}
+
+.apply-form__custom-select-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.apply-form__custom-select-icon {
+  color: color-mix(in srgb, var(--text-main) 50%, transparent);
+  flex-shrink: 0;
+}
+
+.apply-form__custom-select-panel {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  border: 1px solid color-mix(in srgb, var(--text-main) 15%, transparent);
+  border-radius: 0.5rem;
+  background: var(--bg-surface);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--text-main) 18%, transparent);
+  overflow: hidden;
+}
+
+.apply-form__custom-select-search {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-main) 12%, transparent);
+  padding: 0.65rem 0.875rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background: color-mix(in srgb, var(--bg-muted) 35%, var(--bg-surface));
+}
+
+.apply-form__custom-select-search:focus {
+  outline: none;
+}
+
+.apply-form__custom-select-options {
+  max-height: 13rem;
+  overflow-y: auto;
+}
+
+.apply-form__custom-select-option {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: var(--text-main);
+  padding: 0.6rem 0.875rem;
+  cursor: pointer;
+}
+
+.apply-form__custom-select-option:hover {
+  background: color-mix(in srgb, var(--brand-primary) 8%, var(--bg-surface));
+}
+
+.apply-form__custom-select-option--active {
+  background: color-mix(in srgb, var(--brand-primary) 14%, var(--bg-surface));
+  font-weight: 600;
+}
+
+.apply-form__custom-select-empty {
+  padding: 0.65rem 0.875rem;
+  color: color-mix(in srgb, var(--text-main) 58%, transparent);
+  font-size: 0.85rem;
 }
 
 .apply-form__hint {

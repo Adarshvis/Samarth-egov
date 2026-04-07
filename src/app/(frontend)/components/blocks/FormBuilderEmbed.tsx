@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import RichText from '../ui/RichText'
-import { AlertCircle, FileText, Upload, X } from 'lucide-react'
+import { AlertCircle, ChevronDown, FileText, Upload, X } from 'lucide-react'
 
 type FormField = {
   id?: string
@@ -99,6 +99,8 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
   const [success, setSuccess] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [selectValues, setSelectValues] = useState<Record<string, string>>({})
+  const [selectSearch, setSelectSearch] = useState<Record<string, string>>({})
+  const [openSelect, setOpenSelect] = useState<string | null>(null)
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({})
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({})
 
@@ -147,6 +149,18 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
     () => fields.some((field) => field.blockType === 'resumeUpload'),
     [fields],
   )
+
+  useEffect(() => {
+    setSelectValues((prev) => {
+      const next = { ...prev }
+      for (const field of fields) {
+        if (field.blockType !== 'select' || !field.name) continue
+        if (next[field.name] !== undefined) continue
+        next[field.name] = typeof field.defaultValue === 'string' ? field.defaultValue : ''
+      }
+      return next
+    })
+  }, [fields])
 
   function setFileError(fieldName: string, message: string) {
     setFileErrors((prev) => ({ ...prev, [fieldName]: message }))
@@ -482,6 +496,20 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
               if (field.blockType === 'select') {
                 const isWorkStatus = /work.?status/i.test(name) || /work.?status/i.test(field.label || '')
                 const currentSelectVal = selectValues[name] || ''
+                const searchValue = selectSearch[name] || ''
+                const options = field.options || []
+                const filteredOptions = options.filter((option) => {
+                  const keyword = searchValue.trim().toLowerCase()
+                  if (!keyword) return true
+                  return (
+                    option.label.toLowerCase().includes(keyword) ||
+                    option.value.toLowerCase().includes(keyword)
+                  )
+                })
+                const selectedLabel =
+                  options.find((option) => option.value === currentSelectVal)?.label ||
+                  field.placeholder ||
+                  'Select an option'
                 return (
                   <React.Fragment key={key}>
                     <label className={fieldClass}>
@@ -494,15 +522,73 @@ export default function FormBuilderEmbed({ form }: { form: unknown }) {
                         required={Boolean(field.required)}
                         value={currentSelectVal}
                         onChange={(e) => setSelectValues((prev) => ({ ...prev, [name]: e.target.value }))}
-                        className="apply-form__input"
+                        className="apply-form__native-select-proxy"
+                        tabIndex={-1}
+                        aria-hidden="true"
                       >
                         <option value="">{field.placeholder || 'Select an option'}</option>
-                        {(field.options || []).map((option) => (
+                        {options.map((option) => (
                           <option key={`${name}-${option.value}`} value={option.value}>
                             {option.label}
                           </option>
                         ))}
                       </select>
+
+                      <div
+                        className="apply-form__custom-select"
+                        tabIndex={0}
+                        onBlur={(event) => {
+                          const nextTarget = event.relatedTarget as Node | null
+                          if (!event.currentTarget.contains(nextTarget)) {
+                            setOpenSelect((prev) => (prev === name ? null : prev))
+                          }
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="apply-form__custom-select-trigger"
+                          onClick={() => setOpenSelect((prev) => (prev === name ? null : name))}
+                        >
+                          <span className="apply-form__custom-select-label">{selectedLabel}</span>
+                          <ChevronDown size={16} className="apply-form__custom-select-icon" />
+                        </button>
+
+                        {openSelect === name ? (
+                          <div className="apply-form__custom-select-panel">
+                            <input
+                              type="text"
+                              value={searchValue}
+                              onChange={(event) =>
+                                setSelectSearch((prev) => ({ ...prev, [name]: event.target.value }))
+                              }
+                              placeholder="Search options..."
+                              className="apply-form__custom-select-search"
+                            />
+                            <div className="apply-form__custom-select-options">
+                              {filteredOptions.map((option) => (
+                                <button
+                                  type="button"
+                                  key={`${name}-${option.value}`}
+                                  className={`apply-form__custom-select-option${
+                                    currentSelectVal === option.value
+                                      ? ' apply-form__custom-select-option--active'
+                                      : ''
+                                  }`}
+                                  onClick={() => {
+                                    setSelectValues((prev) => ({ ...prev, [name]: option.value }))
+                                    setOpenSelect(null)
+                                  }}
+                                >
+                                  {option.label}
+                                </button>
+                              ))}
+                              {filteredOptions.length === 0 ? (
+                                <div className="apply-form__custom-select-empty">No options found</div>
+                              ) : null}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
                     </label>
                     {isWorkStatus && currentSelectVal.toLowerCase() === 'experienced' && (
                       <label className={fieldClass}>
