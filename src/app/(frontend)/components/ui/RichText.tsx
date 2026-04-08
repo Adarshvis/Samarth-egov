@@ -1,4 +1,6 @@
-import React from 'react'
+'use client'
+
+import React, { useEffect, useState } from 'react'
 import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
 import {
   IS_BOLD,
@@ -54,6 +56,9 @@ const lexicalExtJSXConverters = {
       match = node.style.match(/(?:^|;)\s?color: ([^;]+)/)
       if (match?.[1]) style.color = match[1]
 
+      match = node.style.match(/(?:^|;)\s?font-size: ([^;]+)/)
+      if (match?.[1]) style.fontSize = match[1]
+
       text = <span style={style}>{text}</span>
     }
 
@@ -92,32 +97,39 @@ type RichTextProps = {
 export default function RichText(props: RichTextProps) {
   const { converters: userConverters, className, ...restProps } = props
   const wrapperClassName = ['cms-richtext', className].filter(Boolean).join(' ')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
-    <div className={wrapperClassName}>
-      <PayloadRichText
-        {...restProps}
-        converters={(args: any) => {
-          const defaultConverters = args?.defaultConverters || {}
+    <div className={wrapperClassName} suppressHydrationWarning>
+      {mounted ? (
+        <PayloadRichText
+          {...restProps}
+          converters={(args: any) => {
+            const defaultConverters = args?.defaultConverters || {}
 
-          const pluginConverters = {
-            ...defaultConverters,
-            ...lexicalExtJSXConverters,
-          }
+            const pluginConverters = {
+              ...defaultConverters,
+              ...lexicalExtJSXConverters,
+            }
 
-          if (!userConverters) return pluginConverters
+            if (!userConverters) return pluginConverters
 
-          if (typeof userConverters === 'function') {
-            const resolved = userConverters({ ...args, defaultConverters: pluginConverters })
-            return resolved || pluginConverters
-          }
+            if (typeof userConverters === 'function') {
+              const resolved = userConverters({ ...args, defaultConverters: pluginConverters })
+              return resolved || pluginConverters
+            }
 
-          return {
-            ...pluginConverters,
-            ...userConverters,
-          }
-        }}
-      />
+            return {
+              ...pluginConverters,
+              ...userConverters,
+            }
+          }}
+        />
+      ) : null}
     </div>
   )
 }

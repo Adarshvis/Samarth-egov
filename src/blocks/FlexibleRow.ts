@@ -37,7 +37,7 @@ const RichTextSub: Block = {
       defaultValue: 'base',
       options: [
         { label: 'Small', value: 'sm' },
-        { label: 'Base', value: 'base' },
+        { label: 'Medium', value: 'base' },
         { label: 'Large', value: 'lg' },
         { label: 'XL', value: 'xl' },
         { label: '2XL', value: '2xl' },
@@ -343,6 +343,363 @@ const AnimationSub: Block = {
   ],
 }
 
+const animationField = (name = 'animation', label = 'Animation'): Field => ({
+  name,
+  type: 'select',
+  label,
+  defaultValue: 'none',
+  options: [
+    { label: 'None', value: 'none' },
+    { label: 'Hover Lift', value: 'hoverLift' },
+    { label: 'Pulse', value: 'pulse' },
+    { label: 'Float', value: 'float' },
+  ],
+})
+
+/* ── Sub-block: Stats Cards ── */
+const StatsCardsSub: Block = {
+  slug: 'flexStatsCards',
+  labels: { singular: 'Stats Cards', plural: 'Stats Cards' },
+  fields: [
+    {
+      name: 'columns',
+      type: 'select',
+      defaultValue: '4',
+      options: [
+        { label: '1 Column', value: '1' },
+        { label: '2 Columns', value: '2' },
+        { label: '3 Columns', value: '3' },
+        { label: '4 Columns', value: '4' },
+      ],
+    },
+    {
+      name: 'cardStyle',
+      type: 'select',
+      defaultValue: 'outline',
+      options: [
+        { label: 'Outline', value: 'outline' },
+        { label: 'Elevated', value: 'elevated' },
+        { label: 'Soft', value: 'soft' },
+      ],
+    },
+    {
+      name: 'cards',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      fields: [
+        { name: 'label', type: 'text', required: true },
+        { name: 'value', type: 'text', required: true },
+        { name: 'trend', type: 'text' },
+        { name: 'trendLabel', type: 'text' },
+        iconField('icon', 'Stat Icon'),
+        colorField('iconColor', 'Icon Color', '#1d4ed8'),
+        animationField(),
+      ],
+    },
+  ],
+}
+
+/* ── Sub-block: Feature Cards ── */
+const FeatureCardsSub: Block = {
+  slug: 'flexFeatureCards',
+  labels: { singular: 'Feature Cards', plural: 'Feature Cards' },
+  fields: [
+    {
+      name: 'columns',
+      type: 'select',
+      defaultValue: '3',
+      options: [
+        { label: '1 Column', value: '1' },
+        { label: '2 Columns', value: '2' },
+        { label: '3 Columns', value: '3' },
+        { label: '4 Columns', value: '4' },
+      ],
+    },
+    {
+      name: 'cardStyle',
+      type: 'select',
+      defaultValue: 'borderTop',
+      options: [
+        { label: 'Border Top', value: 'borderTop' },
+        { label: 'Outline', value: 'outline' },
+        { label: 'Dark Glass', value: 'darkGlass' },
+      ],
+    },
+    {
+      name: 'cards',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      fields: [
+        iconField('icon', 'Card Icon'),
+        colorField('iconColor', 'Icon Color', '#1d4ed8'),
+        colorField('accentColor', 'Accent Color', '#1d4ed8'),
+        { name: 'title', type: 'richText', required: true },
+        { name: 'subtitle', type: 'text' },
+        { name: 'description', type: 'richText' },
+        {
+          name: 'points',
+          type: 'array',
+          fields: [{ name: 'text', type: 'text', required: true }],
+        },
+        animationField(),
+      ],
+    },
+  ],
+}
+
+/* ── Sub-block: Highlight Cards ── */
+const HighlightCardsSub: Block = {
+  slug: 'flexHighlightCards',
+  labels: { singular: 'Highlight Cards', plural: 'Highlight Cards' },
+  fields: [
+    {
+      name: 'columns',
+      type: 'select',
+      defaultValue: '2',
+      options: [
+        { label: '1 Column', value: '1' },
+        { label: '2 Columns', value: '2' },
+        { label: '3 Columns', value: '3' },
+      ],
+    },
+    {
+      name: 'theme',
+      type: 'select',
+      defaultValue: 'light',
+      options: [
+        { label: 'Light', value: 'light' },
+        { label: 'Dark', value: 'dark' },
+      ],
+    },
+    {
+      name: 'titleSize',
+      type: 'select',
+      defaultValue: 'base',
+      options: [
+        { label: 'Small (14px)', value: 'sm' },
+        { label: 'Base (16px)', value: 'base' },
+        { label: 'Large (18px)', value: 'lg' },
+        { label: 'XL (20px)', value: 'xl' },
+        { label: '2XL (24px)', value: '2xl' },
+      ],
+    },
+    colorField('iconBgColor', 'Icon Background Color', '#EEF2FF'),
+    {
+      name: 'iconAlignment',
+      type: 'select',
+      defaultValue: 'left',
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Center', value: 'center' },
+        { label: 'Right', value: 'right' },
+      ],
+    },
+    {
+      name: 'cards',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      fields: [
+        iconField('icon', 'Card Icon'),
+        colorField('iconColor', 'Icon Color', '#f59e0b'),
+        { name: 'title', type: 'text', required: true },
+        { name: 'description', type: 'textarea' },
+        animationField(),
+      ],
+    },
+  ],
+}
+
+/* ── Sub-block: Buttons / CTA ── */
+const ButtonsSub: Block = {
+  slug: 'flexButtons',
+  labels: { singular: 'Buttons', plural: 'Buttons' },
+  fields: [
+    {
+      name: 'alignment',
+      type: 'select',
+      defaultValue: 'left',
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Center', value: 'center' },
+        { label: 'Right', value: 'right' },
+      ],
+    },
+    {
+      name: 'buttons',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      fields: [
+        {
+          name: 'label',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'variant',
+          type: 'select',
+          defaultValue: 'primary',
+          options: [
+            { label: 'Primary', value: 'primary' },
+            { label: 'Secondary', value: 'secondary' },
+            { label: 'Outline', value: 'outline' },
+            { label: 'Ghost', value: 'ghost' },
+          ],
+        },
+        {
+          name: 'size',
+          type: 'select',
+          defaultValue: 'md',
+          options: [
+            { label: 'Small', value: 'sm' },
+            { label: 'Medium', value: 'md' },
+            { label: 'Large', value: 'lg' },
+          ],
+        },
+        iconField('icon', 'Button Icon'),
+        {
+          name: 'openInNewTab',
+          type: 'checkbox',
+          defaultValue: false,
+        },
+      ],
+    },
+  ],
+}
+
+/* ── Sub-block: Dashboard Mock Panel ── */
+const DashboardMockSub: Block = {
+  slug: 'flexDashboardMock',
+  labels: { singular: 'Dashboard Mock', plural: 'Dashboard Mocks' },
+  fields: [
+    {
+      name: 'layoutVariant',
+      type: 'select',
+      defaultValue: 'floatingCards',
+      options: [
+        { label: 'Floating Cards', value: 'floatingCards' },
+        { label: 'Sync Status Panel', value: 'syncStatusPanel' },
+      ],
+    },
+    {
+      name: 'theme',
+      type: 'select',
+      defaultValue: 'light',
+      options: [
+        { label: 'Light', value: 'light' },
+        { label: 'Dark', value: 'dark' },
+      ],
+    },
+    {
+      name: 'chartCount',
+      type: 'number',
+      defaultValue: 3,
+      min: 1,
+      max: 4,
+      admin: {
+        description: 'Number of mini tiles/rows inside the mock panel',
+      },
+    },
+    {
+      name: 'topBadgeLabel',
+      type: 'text',
+      defaultValue: 'ACTIVE SCHOOLS',
+    },
+    {
+      name: 'topBadgeLabelSize',
+      type: 'select',
+      defaultValue: 'md',
+      options: [
+        { label: 'Small', value: 'sm' },
+        { label: 'Medium', value: 'md' },
+        { label: 'Large', value: 'lg' },
+      ],
+    },
+    colorField('topBadgeLabelColor', 'Top Badge Label Color', '#64748b'),
+    {
+      name: 'topBadgeValue',
+      type: 'text',
+      defaultValue: '1,500+',
+    },
+    {
+      name: 'topBadgeAnimation',
+      type: 'select',
+      defaultValue: 'float',
+      options: [
+        { label: 'None', value: 'none' },
+        { label: 'Float', value: 'float' },
+        { label: 'Pulse', value: 'pulse' },
+        { label: 'Hover Lift', value: 'hoverLift' },
+      ],
+    },
+    {
+      name: 'topBadgeValueSize',
+      type: 'select',
+      defaultValue: '2xl',
+      options: [
+        { label: 'Large', value: 'lg' },
+        { label: 'XL', value: 'xl' },
+        { label: '2XL', value: '2xl' },
+      ],
+    },
+    colorField('topBadgeValueColor', 'Top Badge Value Color', '#4338ca'),
+    {
+      name: 'bottomChipPrimary',
+      type: 'text',
+      defaultValue: 'Goa Live',
+    },
+    {
+      name: 'bottomChipSecondary',
+      type: 'text',
+      defaultValue: 'National Rollout',
+    },
+    {
+      name: 'bottomSummary',
+      type: 'text',
+      defaultValue: 'Centralized data across schools of India.',
+    },
+    {
+      name: 'bottomBadgeAnimation',
+      type: 'select',
+      defaultValue: 'none',
+      options: [
+        { label: 'None', value: 'none' },
+        { label: 'Float', value: 'float' },
+        { label: 'Pulse', value: 'pulse' },
+        { label: 'Hover Lift', value: 'hoverLift' },
+      ],
+    },
+    {
+      name: 'bottomSummarySize',
+      type: 'select',
+      defaultValue: 'lg',
+      options: [
+        { label: 'Small', value: 'sm' },
+        { label: 'Medium', value: 'md' },
+        { label: 'Large', value: 'lg' },
+        { label: 'XL', value: 'xl' },
+      ],
+    },
+    colorField('bottomSummaryColor', 'Bottom Summary Color', '#334155'),
+    {
+      name: 'syncFooterText',
+      type: 'text',
+      defaultValue: 'SYNCING WITH UDISE+ CLOUD',
+      admin: {
+        description: 'Footer status text for the Sync Status Panel layout',
+      },
+    },
+  ],
+}
+
 /* ── Main Block: Flexible Row ── */
 export const FlexibleRow: Block = {
   slug: 'flexibleRow',
@@ -422,6 +779,11 @@ export const FlexibleRow: Block = {
             CarouselSub,
             MapEmbedSub,
             AnimationSub,
+            StatsCardsSub,
+            FeatureCardsSub,
+            HighlightCardsSub,
+            ButtonsSub,
+            DashboardMockSub,
           ],
         },
       ],

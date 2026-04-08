@@ -1,9 +1,39 @@
 import type { GlobalConfig } from 'payload'
 import { publicAccess, adminAccess } from '../access/roles'
 
+async function sanitizeHeaderChildPageRefs(data: any, payload: any) {
+  if (!data || !Array.isArray(data.navItems)) return data
+
+  const pages = await payload.find({ collection: 'pages', limit: 1000, depth: 0 })
+  const validPageIds = new Set(pages.docs.map((doc: any) => String(doc.id)))
+
+  data.navItems = data.navItems.map((item: any) => {
+    if (!Array.isArray(item?.children)) return item
+
+    const children = item.children.filter((child: any) => {
+      const pageRef = child?.page
+      if (!pageRef) return false
+      if (typeof pageRef === 'object' && 'id' in pageRef) return validPageIds.has(String(pageRef.id))
+      return validPageIds.has(String(pageRef))
+    })
+
+    return {
+      ...item,
+      children,
+    }
+  })
+
+  return data
+}
+
 export const Header: GlobalConfig = {
   slug: 'header',
   label: 'Header',
+  hooks: {
+    beforeChange: [
+      async ({ data, req }) => sanitizeHeaderChildPageRefs(data, req.payload),
+    ],
+  },
   access: {
     read: publicAccess,
     update: adminAccess,

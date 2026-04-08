@@ -1393,6 +1393,171 @@ export interface Page {
                     blockName?: string | null;
                     blockType: 'flexAnimation';
                   }
+                | {
+                    columns?: ('1' | '2' | '3' | '4') | null;
+                    cardStyle?: ('outline' | 'elevated' | 'soft') | null;
+                    cards: {
+                      label: string;
+                      value: string;
+                      trend?: string | null;
+                      trendLabel?: string | null;
+                      /**
+                       * Select a Lucide icon
+                       */
+                      icon?: string | null;
+                      /**
+                       * Pick a color or enter hex value
+                       */
+                      iconColor?: string | null;
+                      animation?: ('none' | 'hoverLift' | 'pulse' | 'float') | null;
+                      id?: string | null;
+                    }[];
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'flexStatsCards';
+                  }
+                | {
+                    columns?: ('1' | '2' | '3' | '4') | null;
+                    cardStyle?: ('borderTop' | 'outline' | 'darkGlass') | null;
+                    cards: {
+                      /**
+                       * Select a Lucide icon
+                       */
+                      icon?: string | null;
+                      /**
+                       * Pick a color or enter hex value
+                       */
+                      iconColor?: string | null;
+                      /**
+                       * Pick a color or enter hex value
+                       */
+                      accentColor?: string | null;
+                      title: {
+                        root: {
+                          type: string;
+                          children: {
+                            type: any;
+                            version: number;
+                            [k: string]: unknown;
+                          }[];
+                          direction: ('ltr' | 'rtl') | null;
+                          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                          indent: number;
+                          version: number;
+                        };
+                        [k: string]: unknown;
+                      };
+                      subtitle?: string | null;
+                      description?: {
+                        root: {
+                          type: string;
+                          children: {
+                            type: any;
+                            version: number;
+                            [k: string]: unknown;
+                          }[];
+                          direction: ('ltr' | 'rtl') | null;
+                          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                          indent: number;
+                          version: number;
+                        };
+                        [k: string]: unknown;
+                      } | null;
+                      points?:
+                        | {
+                            text: string;
+                            id?: string | null;
+                          }[]
+                        | null;
+                      animation?: ('none' | 'hoverLift' | 'pulse' | 'float') | null;
+                      id?: string | null;
+                    }[];
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'flexFeatureCards';
+                  }
+                | {
+                    columns?: ('1' | '2' | '3') | null;
+                    theme?: ('light' | 'dark') | null;
+                    titleSize?: ('sm' | 'base' | 'lg' | 'xl' | '2xl') | null;
+                    /**
+                     * Pick a color or enter hex value
+                     */
+                    iconBgColor?: string | null;
+                    iconAlignment?: ('left' | 'center' | 'right') | null;
+                    cards: {
+                      /**
+                       * Select a Lucide icon
+                       */
+                      icon?: string | null;
+                      /**
+                       * Pick a color or enter hex value
+                       */
+                      iconColor?: string | null;
+                      title: string;
+                      description?: string | null;
+                      animation?: ('none' | 'hoverLift' | 'pulse' | 'float') | null;
+                      id?: string | null;
+                    }[];
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'flexHighlightCards';
+                  }
+                | {
+                    alignment?: ('left' | 'center' | 'right') | null;
+                    buttons: {
+                      label: string;
+                      url: string;
+                      variant?: ('primary' | 'secondary' | 'outline' | 'ghost') | null;
+                      size?: ('sm' | 'md' | 'lg') | null;
+                      /**
+                       * Select a Lucide icon
+                       */
+                      icon?: string | null;
+                      openInNewTab?: boolean | null;
+                      id?: string | null;
+                    }[];
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'flexButtons';
+                  }
+                | {
+                    layoutVariant?: ('floatingCards' | 'syncStatusPanel') | null;
+                    theme?: ('light' | 'dark') | null;
+                    /**
+                     * Number of mini tiles/rows inside the mock panel
+                     */
+                    chartCount?: number | null;
+                    topBadgeLabel?: string | null;
+                    topBadgeLabelSize?: ('sm' | 'md' | 'lg') | null;
+                    /**
+                     * Pick a color or enter hex value
+                     */
+                    topBadgeLabelColor?: string | null;
+                    topBadgeValue?: string | null;
+                    topBadgeAnimation?: ('none' | 'float' | 'pulse' | 'hoverLift') | null;
+                    topBadgeValueSize?: ('lg' | 'xl' | '2xl') | null;
+                    /**
+                     * Pick a color or enter hex value
+                     */
+                    topBadgeValueColor?: string | null;
+                    bottomChipPrimary?: string | null;
+                    bottomChipSecondary?: string | null;
+                    bottomSummary?: string | null;
+                    bottomBadgeAnimation?: ('none' | 'float' | 'pulse' | 'hoverLift') | null;
+                    bottomSummarySize?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                    /**
+                     * Pick a color or enter hex value
+                     */
+                    bottomSummaryColor?: string | null;
+                    /**
+                     * Footer status text for the Sync Status Panel layout
+                     */
+                    syncFooterText?: string | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'flexDashboardMock';
+                  }
               )[]
             | null;
           id?: string | null;
@@ -2571,6 +2736,114 @@ export interface PagesSelect<T extends boolean = true> {
                                 gif?: T;
                                 loop?: T;
                                 autoplay?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          flexStatsCards?:
+                            | T
+                            | {
+                                columns?: T;
+                                cardStyle?: T;
+                                cards?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      value?: T;
+                                      trend?: T;
+                                      trendLabel?: T;
+                                      icon?: T;
+                                      iconColor?: T;
+                                      animation?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                          flexFeatureCards?:
+                            | T
+                            | {
+                                columns?: T;
+                                cardStyle?: T;
+                                cards?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      iconColor?: T;
+                                      accentColor?: T;
+                                      title?: T;
+                                      subtitle?: T;
+                                      description?: T;
+                                      points?:
+                                        | T
+                                        | {
+                                            text?: T;
+                                            id?: T;
+                                          };
+                                      animation?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                          flexHighlightCards?:
+                            | T
+                            | {
+                                columns?: T;
+                                theme?: T;
+                                titleSize?: T;
+                                iconBgColor?: T;
+                                iconAlignment?: T;
+                                cards?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      iconColor?: T;
+                                      title?: T;
+                                      description?: T;
+                                      animation?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                          flexButtons?:
+                            | T
+                            | {
+                                alignment?: T;
+                                buttons?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      url?: T;
+                                      variant?: T;
+                                      size?: T;
+                                      icon?: T;
+                                      openInNewTab?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                          flexDashboardMock?:
+                            | T
+                            | {
+                                layoutVariant?: T;
+                                theme?: T;
+                                chartCount?: T;
+                                topBadgeLabel?: T;
+                                topBadgeLabelSize?: T;
+                                topBadgeLabelColor?: T;
+                                topBadgeValue?: T;
+                                topBadgeAnimation?: T;
+                                topBadgeValueSize?: T;
+                                topBadgeValueColor?: T;
+                                bottomChipPrimary?: T;
+                                bottomChipSecondary?: T;
+                                bottomSummary?: T;
+                                bottomBadgeAnimation?: T;
+                                bottomSummarySize?: T;
+                                bottomSummaryColor?: T;
+                                syncFooterText?: T;
                                 id?: T;
                                 blockName?: T;
                               };
