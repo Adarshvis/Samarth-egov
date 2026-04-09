@@ -348,7 +348,7 @@ function InterlockingRingsLayout({
                       <DynamicIcon name={stat.icon} size={14} color="#fff" />
                     </div>
                   )}
-                  <div className="text-sm font-bold text-white leading-tight">
+                  <div className="text-[0.575rem] font-bold text-white leading-tight">
                     <AnimatedNumber
                       value={stat.numericValue}
                       prefix={stat.prefix}

@@ -65,7 +65,7 @@ export default function Header({ data }: HeaderProps) {
     if (!el) return
 
     const updateHeight = () => {
-      document.documentElement.style.setProperty('--site-header-height', `${el.offsetHeight + 10}px`)
+      document.documentElement.style.setProperty('--site-header-height', `${el.offsetHeight}px`)
     }
 
     updateHeight()

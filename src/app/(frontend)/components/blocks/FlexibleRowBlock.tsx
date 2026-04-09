@@ -1011,6 +1011,13 @@ const alignClasses: Record<string, string> = {
   stretch: 'items-stretch',
 }
 
+function getSectionAutoGridClass(columnCount: number): string {
+  if (columnCount <= 1) return 'grid grid-cols-1'
+  if (columnCount === 2) return 'grid grid-cols-1 lg:grid-cols-2'
+  if (columnCount === 3) return 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+  return 'grid grid-cols-1 md:grid-cols-2'
+}
+
 // ── Main Component ──
 
 interface ColumnData {
@@ -1043,9 +1050,9 @@ export default function FlexibleRowBlock({
   if (!columns || columns.length === 0) return null
 
   const allAuto = columns.every((c) => !c.width || c.width === 'auto')
-
-  // Grid columns: 1-3 → that count per row, 4+ → 2 per row (wraps into 2×2, 2×3, etc.)
-  const gridCols = columns.length <= 3 ? columns.length : 2
+  const containerClass = allAuto
+    ? `${getSectionAutoGridClass(columns.length)} ${gapClasses[gap || '6'] || 'gap-6'} ${alignClasses[verticalAlign || 'start'] || 'items-start'}`
+    : `flex flex-wrap ${gapClasses[gap || '6'] || 'gap-6'} ${alignClasses[verticalAlign || 'start'] || 'items-start'}`
 
   return (
     <section
@@ -1059,10 +1066,7 @@ export default function FlexibleRowBlock({
           alignment={headingAlignment}
         />
 
-        <div
-          className={`flex flex-wrap ${gapClasses[gap || '6'] || 'gap-6'} ${alignClasses[verticalAlign || 'start'] || 'items-start'}`}
-          style={allAuto ? { display: 'grid', gridTemplateColumns: `repeat(${gridCols}, 1fr)` } : undefined}
-        >
+        <div className={containerClass}>
           {columns.map((col, i) => {
             const w = col.width || 'auto'
             const isAuto = w === 'auto'

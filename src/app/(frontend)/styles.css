@@ -110,6 +110,7 @@ body {
   left: 0;
   right: 0;
   z-index: 100;
+  box-shadow: 0 2px 0 0 #e2e8f0;
 }
 
 .site-main {
