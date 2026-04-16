@@ -22,6 +22,7 @@ import FlexibleRowBlock from './blocks/FlexibleRowBlock'
 import CareerPostingBlock from './blocks/CareerPostingBlock'
 import StatesOnboardedBlock from './blocks/StatesOnboardedBlock'
 import FormLayoutBlock from './blocks/FormLayoutBlock'
+import AnalyticsDashboardBlock from './blocks/AnalyticsDashboardBlock'
 
 const blockComponents: Record<string, React.ComponentType<any>> = {
   hero: HeroBlock,
@@ -47,6 +48,7 @@ const blockComponents: Record<string, React.ComponentType<any>> = {
   flexibleRow: FlexibleRowBlock,
   careerPosting: CareerPostingBlock,
   statesOnboarded: StatesOnboardedBlock,
+  analyticsDashboard: AnalyticsDashboardBlock,
 }
 
 interface BlockRendererProps {

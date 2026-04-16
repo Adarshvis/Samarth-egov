@@ -73,6 +73,10 @@
   }
 }
 
+.gap-4 {
+  gap: calc(var(--spacing) * 6);
+}
+
 * {
   box-sizing: border-box;
 }

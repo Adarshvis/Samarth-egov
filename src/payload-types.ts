@@ -1652,6 +1652,57 @@ export interface Page {
         blockName?: string | null;
         blockType: 'careerPosting';
       }
+    | {
+        /**
+         * Section heading displayed above this block
+         */
+        sectionHeading?: string | null;
+        /**
+         * Optional description below the heading
+         */
+        sectionDescription?: string | null;
+        headingAlignment?: ('left' | 'center' | 'right') | null;
+        /**
+         * Toggle off to hide this analytics section without deleting it.
+         */
+        enabled?: boolean | null;
+        /**
+         * Pick a color or enter hex value
+         */
+        backgroundColor?: string | null;
+        /**
+         * Add Superset dashboards as tabs. Get the Embed UUID from Superset → Dashboard → ⋮ → Embed Dashboard.
+         */
+        dashboards?:
+          | {
+              /**
+               * e.g. "Employees on SamarthX", "School Onboarding"
+               */
+              label: string;
+              /**
+               * UUID from Superset embed dialog (e.g. 1f92fb02-ac82-4030-...)
+               */
+              embedUuid: string;
+              height?: number | null;
+              /**
+               * Toggle individual tab visibility without removing it.
+               */
+              visible?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Pick a color or enter hex value
+         */
+        activeTabColor?: string | null;
+        /**
+         * Default height if not set per tab.
+         */
+        dashboardHeight?: number | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'analyticsDashboard';
+      }
   )[];
   updatedAt: string;
   createdAt: string;
@@ -2887,6 +2938,28 @@ export interface PagesSelect<T extends boolean = true> {
               applyButtonText?: T;
               applyButtonLink?: T;
               status?: T;
+              id?: T;
+              blockName?: T;
+            };
+        analyticsDashboard?:
+          | T
+          | {
+              sectionHeading?: T;
+              sectionDescription?: T;
+              headingAlignment?: T;
+              enabled?: T;
+              backgroundColor?: T;
+              dashboards?:
+                | T
+                | {
+                    label?: T;
+                    embedUuid?: T;
+                    height?: T;
+                    visible?: T;
+                    id?: T;
+                  };
+              activeTabColor?: T;
+              dashboardHeight?: T;
               id?: T;
               blockName?: T;
             };

@@ -10,6 +10,7 @@ import * as migration_20260408_060000_update_flex_dashboard_mock_badge_animation
 import * as migration_20260408_070000_convert_flex_feature_cards_text_to_richtext from './20260408_070000_convert_flex_feature_cards_text_to_richtext';
 import * as migration_20260408_080000_add_highlight_cards_style_controls from './20260408_080000_add_highlight_cards_style_controls';
 import * as migration_20260408_090000_add_dashboard_mock_layout_variant from './20260408_090000_add_dashboard_mock_layout_variant';
+import * as migration_20260416_010000_add_analytics_dashboard from './20260416_010000_add_analytics_dashboard';
 
 export const migrations = [
   {
@@ -25,7 +26,7 @@ export const migrations = [
   {
     up: migration_20260407_115828.up,
     down: migration_20260407_115828.down,
-    name: '20260407_115828'
+    name: '20260407_115828',
   },
   {
     up: migration_20260408_010000_add_flexible_row_card_blocks.up,
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20260408_090000_add_dashboard_mock_layout_variant.up,
     down: migration_20260408_090000_add_dashboard_mock_layout_variant.down,
     name: '20260408_090000_add_dashboard_mock_layout_variant',
+  },
+  {
+    up: migration_20260416_010000_add_analytics_dashboard.up,
+    down: migration_20260416_010000_add_analytics_dashboard.down,
+    name: '20260416_010000_add_analytics_dashboard',
   },
 ];

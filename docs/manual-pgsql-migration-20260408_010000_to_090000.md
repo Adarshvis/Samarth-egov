@@ -377,6 +377,7 @@ WHERE table_name = 'pages_blocks_flex_dashboard_mock'
 ORDER BY column_name;
 ```
 
+
 ## Why admin showed blocks but frontend did not show data
 
 Most common reasons in this project:
@@ -404,3 +405,4 @@ Most common reasons in this project:
 4. Create/update one test page block in admin.
 5. Verify records exist in the corresponding `pages_blocks_flex_*` tables.
 6. Verify frontend is connected to the same DB used by admin.
+
