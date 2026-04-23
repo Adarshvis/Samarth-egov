@@ -11,6 +11,7 @@ import * as migration_20260408_070000_convert_flex_feature_cards_text_to_richtex
 import * as migration_20260408_080000_add_highlight_cards_style_controls from './20260408_080000_add_highlight_cards_style_controls';
 import * as migration_20260408_090000_add_dashboard_mock_layout_variant from './20260408_090000_add_dashboard_mock_layout_variant';
 import * as migration_20260416_010000_add_analytics_dashboard from './20260416_010000_add_analytics_dashboard';
+import * as migration_20260423_070302_add_career_posting_fields from './20260423_070302_add_career_posting_fields';
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20260416_010000_add_analytics_dashboard.up,
     down: migration_20260416_010000_add_analytics_dashboard.down,
     name: '20260416_010000_add_analytics_dashboard',
+  },
+  {
+    up: migration_20260423_070302_add_career_posting_fields.up,
+    down: migration_20260423_070302_add_career_posting_fields.down,
+    name: '20260423_070302_add_career_posting_fields'
   },
 ];

@@ -18,6 +18,8 @@ interface CareerPostingBlockProps {
   effectiveDate?: string | null
   content?: any
   problemDomains?: ProblemDomain[] | null
+  problemDomainsHeading?: string | null
+  preApplyContent?: any
   applyButtonText?: string | null
   applyButtonLink?: string | null
   status?: 'active' | 'inactive' | null
@@ -99,6 +101,8 @@ export default function CareerPostingBlock({
   effectiveDate,
   content,
   problemDomains,
+  problemDomainsHeading,
+  preApplyContent,
   applyButtonText,
   applyButtonLink,
   status,
@@ -137,11 +141,20 @@ export default function CareerPostingBlock({
       {/* Problem Domains accordion */}
       {hasDomains && (
         <div className="career-posting__domains">
-          <h2 className="career-posting__domains-heading">Problem Domains</h2>
+          <h2 className="career-posting__domains-heading">{problemDomainsHeading || 'Problem Domains'}</h2>
           <div className="career-accordion">
             {problemDomains!.map((domain, i) => (
               <DomainAccordionItem key={domain.id || i} domain={domain} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Pre-apply rich text content */}
+      {preApplyContent && (
+        <div className="career-posting__pre-apply-content">
+          <div className="career-posting__richtext">
+            <RichText data={preApplyContent} />
           </div>
         </div>
       )}

@@ -1594,6 +1594,10 @@ export interface Page {
           [k: string]: unknown;
         } | null;
         /**
+         * Heading displayed above the problem domains accordion (e.g. "Problem Domains")
+         */
+        problemDomainsHeading?: string | null;
+        /**
          * Expandable sections describing different work areas or specializations
          */
         problemDomains?:
@@ -1636,6 +1640,24 @@ export interface Page {
               id?: string | null;
             }[]
           | null;
+        /**
+         * Optional rich text content displayed between the problem domains and the Apply button
+         */
+        preApplyContent?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         /**
          * CTA label (e.g. "Apply Now")
          */
@@ -2910,6 +2932,7 @@ export interface PagesSelect<T extends boolean = true> {
               excerpt?: T;
               effectiveDate?: T;
               content?: T;
+              problemDomainsHeading?: T;
               problemDomains?:
                 | T
                 | {
@@ -2935,6 +2958,7 @@ export interface PagesSelect<T extends boolean = true> {
                         };
                     id?: T;
                   };
+              preApplyContent?: T;
               applyButtonText?: T;
               applyButtonLink?: T;
               status?: T;

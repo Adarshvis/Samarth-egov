@@ -26,6 +26,14 @@ export const CareerPosting: Block = {
       },
     },
     {
+      name: 'problemDomainsHeading',
+      type: 'text',
+      defaultValue: 'Problem Domains',
+      admin: {
+        description: 'Heading displayed above the problem domains accordion (e.g. "Problem Domains")',
+      },
+    },
+    {
       name: 'problemDomains',
       type: 'array',
       label: 'Problem Domains',
@@ -92,6 +100,13 @@ export const CareerPosting: Block = {
           ],
         },
       ],
+    },
+    {
+      name: 'preApplyContent',
+      type: 'richText',
+      admin: {
+        description: 'Optional rich text content displayed between the problem domains and the Apply button',
+      },
     },
     {
       name: 'applyButtonText',
