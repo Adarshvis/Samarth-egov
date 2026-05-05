@@ -135,6 +135,34 @@ export const JobApplications: CollectionConfig = {
       required: true,
     },
     {
+      name: 'resumeURL',
+      type: 'text',
+      label: 'Resume URL',
+      admin: {
+        hidden: true, // Hidden from admin UI, only used for exports
+        readOnly: true,
+      },
+      hooks: {
+        afterRead: [
+          async ({ data, req }) => {
+            if (!data?.resume) return null
+            
+            try {
+              const resumeId = typeof data.resume === 'object' ? data.resume.id : data.resume
+              const resume = await req.payload.findByID({
+                collection: 'resumes',
+                id: resumeId,
+              })
+              return resume?.url || null
+            } catch (err) {
+              req.payload.logger.error(`Failed to fetch resume URL for application ${data?.id}: ${String(err)}`)
+              return null
+            }
+          },
+        ],
+      },
+    },
+    {
       name: 'status',
       type: 'select',
       label: 'Application Status',
