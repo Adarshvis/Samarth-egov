@@ -2032,6 +2032,7 @@ export interface JobApplication {
   workStatus?: ('fresher' | 'experienced') | null;
   yearOfExperience?: string | null;
   resume: number | Resume;
+  resumeURL?: string | null;
   status: 'new' | 'reviewed' | 'shortlisted' | 'rejected' | 'deleted';
   submittedAt?: string | null;
   updatedAt: string;
@@ -3047,6 +3048,7 @@ export interface JobApplicationsSelect<T extends boolean = true> {
   workStatus?: T;
   yearOfExperience?: T;
   resume?: T;
+  resumeURL?: T;
   status?: T;
   submittedAt?: T;
   updatedAt?: T;

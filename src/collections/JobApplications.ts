@@ -138,6 +138,7 @@ export const JobApplications: CollectionConfig = {
       name: 'resumeURL',
       type: 'text',
       label: 'Resume URL',
+      virtual: true, // This field is computed, not stored in DB
       admin: {
         hidden: true, // Hidden from admin UI, only used for exports
         readOnly: true,
