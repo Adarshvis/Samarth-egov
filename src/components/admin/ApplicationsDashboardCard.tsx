@@ -105,7 +105,7 @@ export default function ApplicationsWidget() {
   const fetchApplications = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/job-applications?limit=200&sort=-createdAt&depth=1', {
+      const res = await fetch('/api/job-applications?limit=0&sort=-createdAt&depth=1', {
         credentials: 'include',
       })
       const data = await res.json()

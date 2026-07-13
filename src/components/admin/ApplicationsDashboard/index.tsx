@@ -9,7 +9,7 @@ export default async function ApplicationsDashboardView() {
     collection: 'job-applications' as any,
     overrideAccess: true,
     depth: 1,
-    limit: 200,
+    limit: 0, // 0 = fetch all records (no pagination cap)
     sort: '-createdAt',
   })
 
